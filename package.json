@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "dev:prod": "env-cmd -f .env.prod next dev --turbopack",
+    "dev": "next dev --turbopack -p 7000",
+    "dev:prod": "env-cmd -f .env.prod next dev --turbopack -p 7000",
     "build": "next build --turbopack",
-    "start": "next start",
+    "start": "next start -p 7000",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "lint:strict": "eslint '*/**/*.{js,jsx,ts,tsx}'",
