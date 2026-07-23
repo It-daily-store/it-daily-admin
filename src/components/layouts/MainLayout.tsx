@@ -76,7 +76,9 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
       <div className="flex  w-full gap-2 flex-col items-center justify-center h-[80vh]">
         <Image
           src={
-            theme !== "dark" ? "/logo/logo-white.png" : "/logo/logo-dark.png"
+            theme !== "dark"
+              ? "/logo/dailyit-logo-black.png"
+              : "/logo/dailyit-logo-white.png"
           }
           width={320}
           height={170}

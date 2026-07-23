@@ -123,8 +123,8 @@ const LoginPage = () => {
             <Image
               src={
                 theme !== "dark"
-                  ? "/logo/logo-white.png"
-                  : "/logo/logo-dark.png"
+                  ? "/logo/dailyit-logo-black.png"
+                  : "/logo/dailyit-logo-white.png"
               }
               width={320}
               height={170}
@@ -210,8 +210,8 @@ const LoginPage = () => {
                 <Image
                   src={
                     theme !== "dark"
-                      ? "/logo/logo-white.png"
-                      : "/logo/logo-dark.png"
+                      ? "/logo/dailyit-logo-black.png"
+                      : "/logo/dailyit-logo-white.png"
                   }
                   width={320}
                   height={170}
