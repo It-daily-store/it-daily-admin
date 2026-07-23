@@ -1,0 +1,33 @@
+export enum tagTypes {
+  detailsCategory = "detailsCategory",
+  categories = "categories",
+  upload = "upload",
+  galleryFolder = "galleryFolder",
+  roles = "roles",
+  admins = "admins",
+  brands = "brands",
+  product = "product",
+  bulkUpload = "bulkUpload",
+  productFilter = "productFilter",
+  notification = "notification",
+  deals = "deals",
+  singleDeal = "singleDeal",
+  orders = "orders",
+}
+
+export const tagTypesList = [
+  tagTypes.detailsCategory,
+  tagTypes.categories,
+  tagTypes.upload,
+  tagTypes.galleryFolder,
+  tagTypes.roles,
+  tagTypes.admins,
+  tagTypes.brands,
+  tagTypes.product,
+  tagTypes.bulkUpload,
+  tagTypes.productFilter,
+  tagTypes.notification,
+  tagTypes.deals,
+  tagTypes.singleDeal,
+  tagTypes.orders,
+];
