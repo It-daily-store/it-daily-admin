@@ -8,6 +8,7 @@
     "build": "next build --turbopack",
     "build:prod": "env-cmd -f .env.prod next build",
     "start": "next start -p 7000",
+    "start:prod": "env-cmd -f .env.prod  next start -p 7000",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "lint:strict": "eslint '*/**/*.{js,jsx,ts,tsx}'",
