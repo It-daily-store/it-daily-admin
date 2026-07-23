@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack -p 7000",
     "dev:prod": "env-cmd -f .env.prod next dev --turbopack -p 7000",
     "build": "next build --turbopack",
+    "build:prod": "env-cmd -f .env.prod next build",
     "start": "next start -p 7000",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
