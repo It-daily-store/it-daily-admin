@@ -30,6 +30,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Mail } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -38,6 +39,7 @@ const formSchema = z.object({
 const VerifyEmail = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { theme } = useTheme();
   const [isSending, setSending] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const { verificationSentTime } = useAppSelector((s) => s.auth);
@@ -241,10 +243,14 @@ const VerifyEmail = () => {
           >
             <Image
               className="mx-auto"
-              src={"/gadget-grid-logo.png"}
+              src={
+                theme !== "dark"
+                  ? "/logo/dailyit-logo-black.png"
+                  : "/logo/dailyit-logo-white.png"
+              }
               height={100}
               width={200}
-              alt="gadget grid logo"
+              alt="Daily It logo"
             />
             <h2 className="text-center text-2xl font-bold text-primary">
               Verify Your Email!

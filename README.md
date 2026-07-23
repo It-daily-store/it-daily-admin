@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="public/logo/logo-dark.png" alt="Gadget Grid Logo" width="200" height="auto">
-  <h1>Gadget Grid Admin Dashboard v2</h1>
+  <img src="public/logo/logo-dark.png" alt="Daily It Logo" width="200" height="auto">
+  <h1>Daily It Admin Dashboard v2</h1>
   <p>A comprehensive admin dashboard for managing an e-commerce platform built with Next.js 15, TypeScript, and modern React patterns.</p>
   <p>This application provides a complete solution for managing products, brands, categories, users, roles, and more.</p>
 </div>

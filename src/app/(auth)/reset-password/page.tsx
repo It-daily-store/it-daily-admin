@@ -6,6 +6,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { globalError } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
@@ -30,6 +31,8 @@ const formSchema = z
 const ResetPassword = () => {
   const [passwordHidden, setPasswordHidden] = useState(true);
   const router = useRouter();
+
+  const { theme } = useTheme();
 
   const params = useSearchParams();
 
@@ -66,10 +69,14 @@ const ResetPassword = () => {
     <div className="z-50 flex min-h-[60vh] w-[90vw] flex-col justify-center rounded-lg bg-background p-8 px-5 shadow-lg min-[540px]:px-10 md:w-[70vw] lg:w-1/2 2xl:w-1/3">
       <Image
         className="mx-auto pb-4"
-        src={"/gadget-grid-logo.png"}
+        src={
+          theme !== "dark"
+            ? "/logo/dailyit-logo-black.png"
+            : "/logo/dailyit-logo-white.png"
+        }
         height={100}
         width={200}
-        alt="gadget grid logo"
+        alt="Daily It logo"
       />
       <h2 className="pb-4 text-center text-2xl font-bold text-primary">
         Reset Password!
