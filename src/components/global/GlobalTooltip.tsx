@@ -19,17 +19,15 @@ const GlobalTooltip = ({
   side?: "top" | "bottom" | "left" | "right";
 }) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent
-          side={side}
-          className={cn("z-99999999999999 max-w-44", className)}
-        >
-          {tooltip}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent
+        side={side}
+        className={cn("z-99999999999999 max-w-44", className)}
+      >
+        {tooltip}
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

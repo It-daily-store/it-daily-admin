@@ -65,7 +65,8 @@ type TExtraProps = {
   tooltip?: string;
 };
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     TExtraProps,
     TButtonVariants {
   asChild?: boolean;
@@ -87,33 +88,31 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const Comp = asChild ? Slot : "button";
     return tooltip ? (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Comp
-              className={cn(buttonVariants({ variant, size, className }))}
-              ref={ref}
-              {...props}
-              disabled={loading || props.disabled}
-            >
-              {loading ? (
-                <Loader className="animate-spin" size={18} />
-              ) : variant === "delete_button" ? (
-                <Trash2 size={18} />
-              ) : variant === "edit_button" ? (
-                <Pencil size={18} />
-              ) : variant === "view_button" ? (
-                <Eye size={18} />
-              ) : variant === "create_button" ? (
-                <Plus size={18} />
-              ) : (
-                children
-              )}
-            </Comp>
-          </TooltipTrigger>
-          <TooltipContent>{tooltip}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Comp
+            className={cn(buttonVariants({ variant, size, className }))}
+            ref={ref}
+            {...props}
+            disabled={loading || props.disabled}
+          >
+            {loading ? (
+              <Loader className="animate-spin" size={18} />
+            ) : variant === "delete_button" ? (
+              <Trash2 size={18} />
+            ) : variant === "edit_button" ? (
+              <Pencil size={18} />
+            ) : variant === "view_button" ? (
+              <Eye size={18} />
+            ) : variant === "create_button" ? (
+              <Plus size={18} />
+            ) : (
+              children
+            )}
+          </Comp>
+        </TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
     ) : (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}

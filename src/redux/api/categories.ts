@@ -76,7 +76,7 @@ const categoriesApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
-      invalidatesTags: [tagTypes.categories],
+      invalidatesTags: (result) => (result ? [tagTypes.categories] : []),
     }),
 
     updateCategory: build.mutation({

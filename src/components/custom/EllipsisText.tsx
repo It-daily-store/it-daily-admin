@@ -15,24 +15,22 @@ type TProps = {
 
 const EllipsisText = ({ text, width = 200, className }: TProps) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <p
-            style={{ width }}
-            className={cn(
-              `overflow-hidden text-ellipsis whitespace-nowrap text-gray`,
-              className,
-            )}
-          >
-            {text}
-          </p>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p className={cn("w-48 text-pure-white")}>{text}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <p
+          style={{ width }}
+          className={cn(
+            `overflow-hidden text-ellipsis whitespace-nowrap text-gray`,
+            className,
+          )}
+        >
+          {text}
+        </p>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p className={cn("w-48 text-pure-white")}>{text}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

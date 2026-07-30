@@ -21,7 +21,7 @@ const detailsCategoryApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: [tagTypes.detailsCategory],
+      invalidatesTags: (result) => (result ? [tagTypes.detailsCategory] : []),
     }),
 
     deleteDetailsCategory: build.mutation({
@@ -31,7 +31,7 @@ const detailsCategoryApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
-      invalidatesTags: [tagTypes.detailsCategory],
+      invalidatesTags: (result) => (result ? [tagTypes.detailsCategory] : []),
     }),
 
     updateDetailsCategory: build.mutation({
@@ -48,7 +48,7 @@ const detailsCategoryApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: [tagTypes.detailsCategory],
+      invalidatesTags: (result) => (result ? [tagTypes.detailsCategory] : []),
     }),
   }),
 });

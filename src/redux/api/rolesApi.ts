@@ -22,7 +22,7 @@ const rolesApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: [tagTypes.roles],
+      invalidatesTags: (result) => (result ? [tagTypes.roles] : []),
     }),
 
     updateRole: build.mutation({
@@ -33,7 +33,7 @@ const rolesApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: [tagTypes.roles],
+      invalidatesTags: (result) => (result ? [tagTypes.roles] : []),
     }),
 
     deleteRole: build.mutation({
@@ -43,7 +43,7 @@ const rolesApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
-      invalidatesTags: [tagTypes.roles],
+      invalidatesTags: (result) => (result ? [tagTypes.roles] : []),
     }),
   }),
 });

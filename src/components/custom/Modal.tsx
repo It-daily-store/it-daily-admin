@@ -1,4 +1,4 @@
-import React, { Dispatch, ReactNode, SetStateAction } from "react";
+import React, { ReactNode } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,8 @@ type TProps = React.ComponentPropsWithRef<typeof Dialog> & {
   title?: string;
   withTrigger?: boolean;
   className?: string;
+  titleClass?: string;
+  showCloseButton?: true;
 };
 
 const Modal = React.forwardRef<HTMLDivElement, TProps>(
@@ -28,6 +30,8 @@ const Modal = React.forwardRef<HTMLDivElement, TProps>(
       title = "New Modal",
       withTrigger = false,
       className,
+      titleClass,
+      showCloseButton = true,
       ...rest
     },
     ref,
@@ -50,8 +54,8 @@ const Modal = React.forwardRef<HTMLDivElement, TProps>(
             )}
           </DialogTrigger>
         )}
-        <DialogContent className={className}>
-          <DialogTitle>{title}</DialogTitle>
+        <DialogContent className={className} showCloseButton={showCloseButton}>
+          <DialogTitle className={titleClass}>{title}</DialogTitle>
           <DialogDescription></DialogDescription>
           {children}
         </DialogContent>

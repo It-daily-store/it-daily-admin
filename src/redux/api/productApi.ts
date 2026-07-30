@@ -16,7 +16,7 @@ const productApi = baseApi.injectEndpoints({
           data: productClone,
         };
       },
-      invalidatesTags: [tagTypes.product],
+      invalidatesTags: (result) => (result ? [tagTypes.product] : []),
     }),
 
     getAllProducts: build.query<
@@ -30,7 +30,7 @@ const productApi = baseApi.injectEndpoints({
           params: params || {},
         };
       },
-      providesTags: [tagTypes.product],
+      providesTags: (result) => (result ? [tagTypes.product] : []),
       keepUnusedDataFor: 180,
     }),
 
@@ -60,7 +60,7 @@ const productApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: [tagTypes.product],
+      invalidatesTags: (result) => (result ? [tagTypes.product] : []),
     }),
 
     downloadJsonTemplate: build.mutation({

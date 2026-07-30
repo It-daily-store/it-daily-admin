@@ -1,6 +1,7 @@
 "use client";
 import PageHeader from "@/components/common/PageHeader";
 import Modal from "@/components/custom/Modal";
+import DeleteModal from "@/components/global/DeleteModal";
 import DetailsCategorySkeleton from "@/components/details-category/DetailsCategorySkeleton";
 const CreateProductFilter = dynamic(
   () => import("@/components/productFilter/CreateProductFilter"),
@@ -244,49 +245,32 @@ const ProductFilterPage = () => {
       </Modal>
 
       {/* =================delete filte modal=============== */}
-      <Modal
+      <DeleteModal
         open={deleteOpen !== null}
         onOpenChange={() => setDeleteOpen(null)}
+        onConfirm={() => deleteOpen && handleDeleteFilter()}
+        isLoading={isDeleting}
         title="Delete Product Filter"
       >
-        <div>
-          <h2 className="pb-4 text-red-orange">
-            Warning: You are about to delete a product filter.
-          </h2>
-          <h3 className="pb-2 text-sm">
-            #Deleting a filter can have significant consequences for inventory
-            filtering and search. Please ensure the following before proceeding:
-          </h3>
-          <ul className="list-decimal ps-5 text-sm text-gray">
-            <li>
-              Make sure to check if this filter is added to any products. If yes
-              make sure to remove this filter from those products and update
-              accordingly.
-            </li>
-            <li>
-              This action will permanently remove the admin’s access and may
-              affect critical administrative operations.
-            </li>
-          </ul>
-        </div>
-
-        <div className="flex w-full gap-3 pt-4">
-          <Button
-            className="w-full"
-            variant={"delete_solid"}
-            onClick={() => setDeleteOpen(null)}
-          >
-            Cancel
-          </Button>
-          <Button
-            loading={isDeleting}
-            onClick={() => deleteOpen && handleDeleteFilter()}
-            className="w-full"
-          >
-            Delete
-          </Button>
-        </div>
-      </Modal>
+        <h2 className="pb-4 text-red-orange">
+          Warning: You are about to delete a product filter.
+        </h2>
+        <h3 className="pb-2 text-sm">
+          #Deleting a filter can have significant consequences for inventory
+          filtering and search. Please ensure the following before proceeding:
+        </h3>
+        <ul className="list-decimal ps-5 text-sm text-gray">
+          <li>
+            Make sure to check if this filter is added to any products. If yes
+            make sure to remove this filter from those products and update
+            accordingly.
+          </li>
+          <li>
+            This action will permanently remove the admin’s access and may
+            affect critical administrative operations.
+          </li>
+        </ul>
+      </DeleteModal>
     </div>
   );
 };

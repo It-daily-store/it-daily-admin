@@ -20,6 +20,7 @@ import {
 import { globalError } from "@/lib/utils";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import DeleteModal from "@/components/global/DeleteModal";
 
 type TProps = {
   data: TProductCategory[];
@@ -299,33 +300,19 @@ const DetailsCategoryInfo = ({ data }: TProps) => {
       </Dialog>
 
       {/* ===========delete confimation modal=========== */}
-      <Dialog open={openDeleteId !== null} onOpenChange={handleCloseModal}>
-        <DialogContent>
-          <DialogTitle>
-            <h1 className="text-red">Detete Category</h1>
-          </DialogTitle>
-          <div>
-            <h3 className="pb-3 text-gray">Name: {selectedCat?.name}</h3>
-            <DialogDescription className="text-gray">
-              Do you really want to delete this details category?
-            </DialogDescription>
-
-            <div className="flex w-full gap-3 pt-4">
-              <Button className="w-full" onClick={handleCloseModal}>
-                Cancel
-              </Button>
-              <Button
-                loading={isDeleting}
-                onClick={() => handleDelete(openDeleteId)}
-                className="w-full"
-                variant={"delete_solid"}
-              >
-                Yes, delete it
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DeleteModal
+        open={openDeleteId !== null}
+        onOpenChange={handleCloseModal}
+        onConfirm={() => handleDelete(openDeleteId)}
+        isLoading={isDeleting}
+        title="Delete Category"
+        confirmText="Yes, delete it"
+      >
+        <h3 className="pb-3 text-gray">Name: {selectedCat?.name}</h3>
+        <p className="text-gray">
+          Do you really want to delete this details category?
+        </p>
+      </DeleteModal>
     </div>
   );
 };

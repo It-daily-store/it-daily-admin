@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import DeleteModal from "@/components/global/DeleteModal";
 import { generateCategoryTree } from "@/components/utilities/category/categoryUtils";
 import { TCategory, TTreeCategory } from "@/interface/category";
 import { globalError } from "@/lib/utils";
@@ -129,6 +129,7 @@ const Category = () => {
         });
       }
     } catch (err) {
+      globalError(err);
       console.log(err);
     }
   };
@@ -278,38 +279,21 @@ const Category = () => {
 
       {/*====================== delete category modal===================== */}
 
-      <Dialog
+      <DeleteModal
         open={deleteOpen.open}
         onOpenChange={() => setDeleteOpen({ open: false, id: "" })}
+        onConfirm={handleDelete}
+        isLoading={deleting}
+        title="Delete Category"
+        confirmText="Yes, delete it"
       >
-        <DialogContent>
-          <DialogTitle className="text-red">Delete Category</DialogTitle>
-
-          <div>
-            <h3 className="pb-3 text-gray">Name: {deleteOpen.name}</h3>
-            <DialogDescription className="text-gray">
-              Do you really want to delete this category?
-            </DialogDescription>
-
-            <div className="flex w-full gap-3 pt-4">
-              <Button
-                className="w-full"
-                onClick={() => setDeleteOpen({ open: false, id: "" })}
-              >
-                Cancel
-              </Button>
-              <Button
-                loading={deleting}
-                onClick={handleDelete}
-                className="w-full"
-                variant={"delete_solid"}
-              >
-                Yes, delete it
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+        <h3 className="pb-3 text-dark-gray text-center font-semibold">
+          Name: {deleteOpen.name}
+        </h3>
+        <p className="text-dark-gray text-center font-semibold">
+          Do you really want to delete this category?
+        </p>
+      </DeleteModal>
     </div>
   );
 };

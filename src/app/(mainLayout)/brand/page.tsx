@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { globalError, isValidUrl } from "@/lib/utils";
 import CreateBrand from "@/components/brand/CreateBrand";
-import Modal from "@/components/custom/Modal";
+import DeleteModal from "@/components/global/DeleteModal";
 import { toast } from "sonner";
 import EditBrand from "@/components/brand/EditBrand";
 import PageHeader from "@/components/common/PageHeader";
@@ -183,54 +183,33 @@ const BrandPage = () => {
       <EditBrand openBrand={editOpen} setOpen={setEditOpen} />
 
       {/* ================= delete brand modal================ */}
-      <Modal
+      <DeleteModal
         open={deleteOpen !== null}
         onOpenChange={() => setDeleteOpen(null)}
+        onConfirm={handleDeleteBrand}
+        isLoading={isDeleting}
         title="Delete Brand"
       >
-        <>
-          <div>
-            <h2 className="pb-4 text-red-orange">
-              Warning: You are about to delete a brand.
-            </h2>
-            <h3 className="pb-2 text-sm">
-              Deleting a brand can have significant consequences for your
-              product catalog and customer experience. Please ensure the
-              following before proceeding:
-            </h3>
-            <ul className="list-decimal ps-5 text-sm text-gray">
-              <li>
-                Verify that the brand is no longer associated with any active
-                products or campaigns.
-              </li>
-              <li>
-                Ensure that there are no ongoing dependencies related to this
-                brand. This action will permanently remove the brand from your
-                system and may affect product visibility and inventory
-                management.
-              </li>
-            </ul>
-          </div>
-
-          <div className="flex w-full gap-3 pt-4">
-            <Button
-              className="w-full"
-              variant={"outline"}
-              onClick={() => setDeleteOpen(null)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant={"destructive"}
-              loading={isDeleting}
-              onClick={handleDeleteBrand}
-              className="w-full"
-            >
-              Delete
-            </Button>
-          </div>
-        </>
-      </Modal>
+        <h2 className="pb-4 text-warning font-bold">
+          Warning: You are about to delete a brand.
+        </h2>
+        <h3 className="pb-2 text-sm">
+          Deleting a brand can have significant consequences for your product
+          catalog and customer experience. Please ensure the following before
+          proceeding:
+        </h3>
+        <ul className="list-decimal ps-5 text-sm text-dark-gray">
+          <li>
+            Verify that the brand is no longer associated with any active
+            products or campaigns.
+          </li>
+          <li>
+            Ensure that there are no ongoing dependencies related to this brand.
+            This action will permanently remove the brand from your system and
+            may affect product visibility and inventory management.
+          </li>
+        </ul>
+      </DeleteModal>
     </>
   );
 };

@@ -25,7 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CreateAdminModal from "@/components/users/admin/CreateAdminModal";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import Modal from "@/components/custom/Modal";
+import DeleteModal from "@/components/global/DeleteModal";
 import { useAppSelector } from "@/redux/hooks";
 import NoData from "@/components/shared/NoData";
 import { User } from "lucide-react";
@@ -114,16 +114,14 @@ const Admins = () => {
                   {!admin?.role?.isDeleted ? (
                     <p className="text-gray">{admin?.role?.role}</p>
                   ) : (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <p className="text-red">{admin?.role?.role}</p>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          The role was probably deleted
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <p className="text-red">{admin?.role?.role}</p>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        The role was probably deleted
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </TableCell>
                 <TableCell className="font-semibold">
@@ -167,49 +165,31 @@ const Admins = () => {
         <NoData text="Admin data unavailable" />
       )}
 
-      <Modal
+      <DeleteModal
         open={deleteOpen !== null}
         onOpenChange={() => setDeleteOpen(null)}
+        onConfirm={() => deleteOpen && handleDeleteAdmin(deleteOpen)}
+        isLoading={isDeleting}
         title="Delete Admin"
       >
-        <div>
-          <h2 className="pb-4 text-red-orange">
-            Warning: You are about to delete an admin.
-          </h2>
-          <h3 className="pb-2 text-sm">
-            #Deleting an admin can have significant consequences for system
-            management and control. Please ensure the following before
-            proceeding:
-          </h3>
-          <ul className="list-decimal ps-5 text-sm text-gray">
-            <li>
-              Verify that there are other admins with sufficient permissions to
-              manage the system.
-            </li>
-            <li>
-              This action will permanently remove the admin’s access and may
-              affect critical administrative operations.
-            </li>
-          </ul>
-        </div>
-
-        <div className="flex w-full gap-3 pt-4">
-          <Button
-            className="w-full"
-            variant={"delete_solid"}
-            onClick={() => setDeleteOpen(null)}
-          >
-            Cancel
-          </Button>
-          <Button
-            loading={isDeleting}
-            onClick={() => deleteOpen && handleDeleteAdmin(deleteOpen)}
-            className="w-full"
-          >
-            Delete
-          </Button>
-        </div>
-      </Modal>
+        <h2 className="pb-4 text-red-orange">
+          Warning: You are about to delete an admin.
+        </h2>
+        <h3 className="pb-2 text-sm">
+          #Deleting an admin can have significant consequences for system
+          management and control. Please ensure the following before proceeding:
+        </h3>
+        <ul className="list-decimal ps-5 text-sm text-gray">
+          <li>
+            Verify that there are other admins with sufficient permissions to
+            manage the system.
+          </li>
+          <li>
+            This action will permanently remove the admin’s access and may
+            affect critical administrative operations.
+          </li>
+        </ul>
+      </DeleteModal>
     </div>
   );
 };

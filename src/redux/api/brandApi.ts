@@ -22,7 +22,7 @@ const brandApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: [tagTypes.brands],
+      invalidatesTags: (result) => (result ? [tagTypes.brands] : []),
     }),
 
     deleteBrand: build.mutation({
@@ -32,7 +32,7 @@ const brandApi = baseApi.injectEndpoints({
           method: "DELETE",
         };
       },
-      invalidatesTags: [tagTypes.brands],
+      invalidatesTags: (result) => (result ? [tagTypes.brands] : []),
     }),
 
     updateBrand: build.mutation({
@@ -43,7 +43,7 @@ const brandApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: [tagTypes.brands],
+      invalidatesTags: (result) => (result ? [tagTypes.brands] : []),
     }),
   }),
 });

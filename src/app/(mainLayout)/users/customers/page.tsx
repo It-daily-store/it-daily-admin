@@ -9,7 +9,6 @@ import {
   useGetAllAdminsQuery,
 } from "@/redux/api/usersApi";
 import { globalError } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Modal from "@/components/custom/Modal";
+import DeleteModal from "@/components/global/DeleteModal";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
@@ -121,16 +120,14 @@ const Customers = () => {
 
         if (isDeleted) {
           return (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-red-600 font-medium cursor-help">
-                    {role || "unknown"}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>Role was deleted from system</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-red-600 font-medium cursor-help">
+                  {role || "unknown"}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Role was deleted from system</TooltipContent>
+            </Tooltip>
           );
         }
         return (
@@ -220,10 +217,13 @@ const Customers = () => {
       />
 
       {/* Delete Confirmation Modal */}
-      <Modal
+      <DeleteModal
         open={deleteOpen !== null}
         onOpenChange={() => setDeleteOpen(null)}
+        onConfirm={handleDeleteCustomer}
+        isLoading={isDeleting}
         title="Delete Customer"
+        confirmText="Yes, Delete Customer"
       >
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-red-600">
@@ -234,25 +234,7 @@ const Customers = () => {
             orders, and related data will be permanently removed.
           </p>
         </div>
-
-        <div className="flex gap-3 pt-6">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => setDeleteOpen(null)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            className="w-full"
-            loading={isDeleting}
-            onClick={handleDeleteCustomer}
-          >
-            Yes, Delete Customer
-          </Button>
-        </div>
-      </Modal>
+      </DeleteModal>
     </>
   );
 };

@@ -42,7 +42,7 @@ const CreateProductFilter = () => {
     formState: { errors },
   } = form;
   const { fields, append, remove } = useFieldArray<any>({
-    control: control,
+    control: control as any,
     name: "options",
   });
 

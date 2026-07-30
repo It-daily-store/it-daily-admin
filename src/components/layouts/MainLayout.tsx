@@ -15,6 +15,7 @@ import { Toaster } from "sonner";
 import { Loader } from "lucide-react";
 import Image from "next/image";
 import { LoadingScreen } from "../shared/LoadingScreen";
+import { TooltipProvider } from "../ui/tooltip";
 
 const MainLayout = ({ children }: { children: ReactNode }) => {
   const { theme } = useTheme();
@@ -96,18 +97,20 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>
       {hydrated ? (
-        <div className="flex bg-background-foreground w-full">
-          <AppSidebar />
-          <main
-            className={`relative bg-background ${state === "expanded" ? "md:w-[calc(100%-256px)]" : "md:w-[calc(100%-48px)]"} w-full`}
-          >
-            <Navbar />
-            <div className="w-full rounded-md bg-background p-3">
-              {children}
-            </div>
-          </main>
-          <Toaster richColors closeButton position="top-center" />
-        </div>
+        <TooltipProvider>
+          <div className="flex bg-background-foreground w-full">
+            <AppSidebar />
+            <main
+              className={`relative bg-background ${state === "expanded" ? "md:w-[calc(100%-256px)]" : "md:w-[calc(100%-48px)]"} w-full`}
+            >
+              <Navbar />
+              <div className="w-full rounded-md bg-background p-3">
+                {children}
+              </div>
+            </main>
+            <Toaster richColors closeButton position="top-center" />
+          </div>
+        </TooltipProvider>
       ) : (
         <></>
       )}

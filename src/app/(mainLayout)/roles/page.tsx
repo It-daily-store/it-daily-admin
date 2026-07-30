@@ -18,13 +18,7 @@ import ViewRoleModal from "@/components/roles/ViewRoleModal";
 import { useAppSelector } from "@/redux/hooks";
 import EditRoleModal from "@/components/roles/EditRoleModal";
 import CreateRoleModal from "@/components/roles/CreateRoleModal";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import DeleteModal from "@/components/global/DeleteModal";
 import { toast } from "sonner";
 import NoData from "@/components/shared/NoData";
 import PageHeader from "@/components/common/PageHeader";
@@ -36,7 +30,7 @@ const Roles = () => {
   const { permissions, user } = useAppSelector((s) => s.auth);
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteRole, { isLoading: isDeleting }] = useDeleteRoleMutation();
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState<TRole | null>(null);
 
   const rolePermission: TPermission | undefined = permissions?.find(
     (p) => p.feature === "role",
@@ -50,7 +44,7 @@ const Roles = () => {
     try {
       const res = await deleteRole(id).unwrap();
       toast.success(res.message);
-      setDeleteOpen(false);
+      setRoleToDelete(null);
     } catch (err) {
       globalError(err);
     }
@@ -113,61 +107,11 @@ const Roles = () => {
                     )}
                   {rolePermission?.access.delete &&
                     user?.role._id !== role._id && (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant={"delete_button"}
-                            size={"base"}
-                          ></Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogTitle>Delete this role?</DialogTitle>
-                          <h2 className="pb-4 text-red-orange">
-                            Warning: You are about to the role ({role.role}
-                            ).
-                          </h2>
-                          <h3 className="pb-2 text-sm">
-                            #Deleting a role will permanently remove its
-                            associated permissions and may impact all users
-                            currently assigned to this role. Please ensure the
-                            following:
-                          </h3>
-                          <ul className="list-decimal ps-5 text-sm text-gray">
-                            <li>
-                              Review which users are assigned to this role, as
-                              they will lose access associated with this role.
-                            </li>
-                            <li>
-                              Consider whether there is a suitable replacement
-                              role to assign these users to
-                            </li>
-                            <li>
-                              This action is irreversible and could disrupt
-                              workflows and access for affected users.
-                            </li>
-                          </ul>
-
-                          <div className="flex w-full gap-3 pt-4">
-                            <DialogClose asChild>
-                              <Button
-                                onClick={() => setDeleteOpen(false)}
-                                className="w-full"
-                                variant={"outline"}
-                              >
-                                Cancel
-                              </Button>
-                            </DialogClose>
-                            <Button
-                              loading={isDeleting}
-                              variant={"destructive"}
-                              className="w-full"
-                              onClick={() => handleDelete(role._id)}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button
+                        onClick={() => setRoleToDelete(role)}
+                        variant={"delete_button"}
+                        size={"base"}
+                      ></Button>
                     )}
                 </TableCell>
               </TableRow>
@@ -180,6 +124,37 @@ const Roles = () => {
 
       <ViewRoleModal viewData={veiwData} setOpen={setViewData} />
       <EditRoleModal editData={editData} setOpen={setEditData} />
+
+      <DeleteModal
+        open={roleToDelete !== null}
+        onOpenChange={() => setRoleToDelete(null)}
+        onConfirm={() => roleToDelete && handleDelete(roleToDelete._id)}
+        isLoading={isDeleting}
+        title="Delete this role?"
+      >
+        <h2 className="pb-4 text-red-orange">
+          Warning: You are about to delete the role ({roleToDelete?.role}).
+        </h2>
+        <h3 className="pb-2 text-sm">
+          #Deleting a role will permanently remove its associated permissions
+          and may impact all users currently assigned to this role. Please
+          ensure the following:
+        </h3>
+        <ul className="list-decimal ps-5 text-sm text-gray">
+          <li>
+            Review which users are assigned to this role, as they will lose
+            access associated with this role.
+          </li>
+          <li>
+            Consider whether there is a suitable replacement role to assign
+            these users to
+          </li>
+          <li>
+            This action is irreversible and could disrupt workflows and access
+            for affected users.
+          </li>
+        </ul>
+      </DeleteModal>
     </div>
   );
 };

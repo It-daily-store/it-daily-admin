@@ -10,7 +10,6 @@ import React, {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
@@ -40,6 +39,7 @@ import {
 } from "../ui/breadcrumb";
 import { Input } from "../ui/input";
 import { globalError } from "@/lib/utils";
+import DeleteModal from "../global/DeleteModal";
 import {
   ChevronRight,
   Cloudy,
@@ -366,32 +366,25 @@ const ImageGallery = ({
                       </div>
                     </DialogContent>
                   </Dialog>
-                  <Dialog
+                  <Button
+                    variant={"icon"}
+                    className="text-sm"
+                    onClick={() => setDeleteFolderOpen(true)}
+                  >
+                    <Trash />
+                  </Button>
+                  <DeleteModal
                     open={deleteFolderOpen}
                     onOpenChange={setDeleteFolderOpen}
+                    onConfirm={() => handleDeleteFolder(folder._id)}
+                    isLoading={isDeleting}
+                    title="Delete folder"
                   >
-                    <DialogTrigger>
-                      <Button variant={"icon"} className="text-sm">
-                        <Trash />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogTitle>Delete folder</DialogTitle>
-
-                      <DialogDescription className="text-red">
-                        <h2>Warning!</h2>
-                        <p>This is a desctructive </p>
-                      </DialogDescription>
-                      <div className="flex flex-col gap-4">
-                        <Button
-                          loading={isDeleting}
-                          onClick={() => handleDeleteFolder(folder._id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                    <h2 className="text-red-orange">Warning!</h2>
+                    <p className="text-sm text-gray">
+                      This is a destructive action and cannot be undone.
+                    </p>
+                  </DeleteModal>
                 </div>
               )}
             </div>
@@ -461,39 +454,25 @@ const ImageGallery = ({
                 >
                   <ListChecks /> Deselect All
                 </Button>
-                <Dialog
+                <Button
+                  variant={"delete_solid"}
+                  className="gap-2"
+                  onClick={() => setDeleteModalOpen(true)}
+                >
+                  <Trash2 /> Delete
+                </Button>
+                <DeleteModal
                   open={deleteModalOpen}
                   onOpenChange={setDeleteModalOpen}
+                  onConfirm={handleDeleteImages}
+                  isLoading={deletingImages}
+                  title="Delete Photos?"
+                  confirmText="Yes, delete it"
                 >
-                  <DialogTrigger asChild>
-                    <Button variant={"delete_solid"} className="gap-2">
-                      <Trash2 /> Delete
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogTitle>Delete Photos?</DialogTitle>
-                    <DialogDescription className="text-gray">
-                      Do you really want to delete this photos?
-                    </DialogDescription>
-
-                    <div className="flex w-full gap-3 pt-4">
-                      <Button
-                        className="w-full"
-                        onClick={() => setDeleteModalOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={handleDeleteImages}
-                        className="w-full"
-                        variant={"delete_solid"}
-                        loading={deletingImages}
-                      >
-                        Yes, delete it
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                  <p className="text-gray">
+                    Do you really want to delete this photos?
+                  </p>
+                </DeleteModal>
               </div>
             </div>
           )}
