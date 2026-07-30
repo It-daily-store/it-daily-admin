@@ -12,7 +12,7 @@ import {
   FormItem,
   FormMessage,
 } from "../ui/form";
-import { useForm, FieldErrors } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
@@ -29,7 +29,6 @@ import { globalError } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import slugify from "slugify";
 import ImageSelect from "../common/ImageSelect";
-import { Checkbox } from "@radix-ui/react-checkbox";
 import {
   Select,
   SelectContent,

@@ -32,7 +32,6 @@ const GlobalModal = React.forwardRef<HTMLDivElement, TProps>(
       customTitle,
       resizable = true,
       buttons,
-      ...rest
     },
     ref,
   ) => {

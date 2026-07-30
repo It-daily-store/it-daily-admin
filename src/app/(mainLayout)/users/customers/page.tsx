@@ -14,12 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import DeleteModal from "@/components/global/DeleteModal";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks";
 import PageHeader from "@/components/common/PageHeader";
 import { TUser } from "@/interface/auth.interface";
@@ -34,7 +32,6 @@ const Customers = () => {
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const [deleteOpen, setDeleteOpen] = useState<string | null>(null);
   const { user } = useAppSelector((s) => s.auth);
-  const router = useRouter();
 
   if (!isLoading && error) globalError(error);
 

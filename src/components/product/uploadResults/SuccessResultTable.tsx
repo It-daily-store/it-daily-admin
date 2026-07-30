@@ -3,7 +3,6 @@ import GlobalTable, {
 } from "@/components/common/GlobalTable/GlobalTable";
 import Pagination from "@/components/ui/pagination";
 import { TSuccessData } from "@/interface/bulkupload.interface";
-import { ColumnDef } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 
 const SuccessResultTable = ({

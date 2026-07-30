@@ -1,6 +1,5 @@
 "use client";
-import useGetAdminData from "@/hooks/useGetAdminData";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { UserRound } from "lucide-react";
 import { TUser } from "@/interface/auth.interface";

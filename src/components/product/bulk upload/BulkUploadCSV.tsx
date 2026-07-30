@@ -7,7 +7,6 @@ import { globalError } from "@/lib/utils";
 import UploadResults from "@/components/product/bulk upload/UploadResults";
 import { TBulkUploadResults } from "@/interface/product.interface";
 import { TMapedField } from "@/app/(mainLayout)/product/bulk-upload/page";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const BulkUploadCSV = () => {
@@ -16,7 +15,6 @@ const BulkUploadCSV = () => {
   const [currentTab, setCurrentTab] = useState<number>(1);
   const [bulkUpload, { isLoading: isUploading }] = useBulkUploadMutation();
   const [results, setResults] = useState<TBulkUploadResults | null>(null);
-  const router = useRouter();
 
   const compByStep: { step: number; title: string }[] = [
     {

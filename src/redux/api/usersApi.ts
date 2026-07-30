@@ -1,4 +1,3 @@
-import TdUser from "@/components/global/TdUser";
 import { baseApi } from "./baseApi";
 import { tagTypes } from "./tagTypes";
 import { TUser } from "@/interface/auth.interface";

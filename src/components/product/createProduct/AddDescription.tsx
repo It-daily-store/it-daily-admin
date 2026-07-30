@@ -1,10 +1,8 @@
 import Editor from "@/components/global/editor/Editor";
 import { TProduct } from "@/interface/product.interface";
-import { useAppSelector } from "@/redux/hooks";
-import React, { useCallback, useEffect, useRef } from "react";
+import React from "react";
 
 const AddDescription = ({
-  edit,
   product,
   updateProduct,
 }: {
@@ -15,13 +13,6 @@ const AddDescription = ({
   const currentProduct = product;
 
   const { description } = currentProduct;
-
-  const handleChange = useCallback(
-    <K extends keyof TProduct>(key: K, value: TProduct[K]) => {
-      updateProduct(key, value);
-    },
-    [edit],
-  );
 
   return (
     <div>

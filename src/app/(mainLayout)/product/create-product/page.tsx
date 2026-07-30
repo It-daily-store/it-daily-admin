@@ -1,22 +1,17 @@
 "use client";
 
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import React, { ReactNode, useState } from "react";
 import AddBasicData from "@/components/product/createProduct/AddBasicData";
 import AddSpecifications from "@/components/product/createProduct/AddSpecifications";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/custom/Modal";
-import {
-  useAddNewProductMutation,
-  useUpdateProductMutation,
-} from "@/redux/api/productApi";
+import { useAddNewProductMutation } from "@/redux/api/productApi";
 import { toast } from "sonner";
 import { globalError } from "@/lib/utils";
 import AddDescription from "@/components/product/createProduct/AddDescription";
 import { ProductValidations } from "@/validations/createProductValidations";
 import { ZodError } from "zod";
 import AddMetaData from "@/components/product/createProduct/AddMetaData";
-import { useRouter } from "nextjs-toploader/app";
 import PageHeader from "@/components/common/PageHeader";
 import { TProduct } from "@/interface/product.interface";
 
@@ -65,7 +60,6 @@ const initialProduct: TProduct = {
 };
 
 const CreateProduct = () => {
-  const dispatch = useAppDispatch();
   const [addNewProduct, { isLoading: isCreating }] = useAddNewProductMutation();
   const [resetOpen, setResetOpen] = useState(false);
   const [step, setStep] = useState(1);

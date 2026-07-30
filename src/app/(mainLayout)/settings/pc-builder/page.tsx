@@ -5,12 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox, Option } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  ISettings,
-  PcBuildSettings,
-  PcCategory,
-  PcPart,
-} from "@/interface/settings";
+import { PcBuildSettings, PcPart } from "@/interface/settings";
 import { useGetAllCategoriesQuery } from "@/redux/api/categories";
 import {
   useGetSettingsQuery,
@@ -57,7 +52,7 @@ const PcBuilderPage = () => {
 
   const handleUpdate = async () => {
     try {
-      const res = await updateSettings({
+      await updateSettings({
         pcBuilder,
       }).unwrap();
     } catch (err) {

@@ -1,10 +1,5 @@
 import React, { ReactNode } from "react";
-import {
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-  Tooltip,
-} from "../ui/tooltip";
+import { TooltipTrigger, TooltipContent, Tooltip } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const GlobalTooltip = ({

@@ -3,7 +3,7 @@ import {
   useAddProductsToDealMutation,
   useGetProductsForDealQuery,
 } from "@/redux/api/dealsApi";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import GlobalTable, {
   TCustomColumnDef,
 } from "../common/GlobalTable/GlobalTable";
@@ -11,11 +11,7 @@ import { TProduct } from "@/interface/product.interface";
 import { Checkbox } from "../ui/checkbox";
 import { calculateDiscountPrice } from "@/utils/product.utis";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import {
-  TDeal,
-  TDealPayloadProduct,
-  TDealProduct,
-} from "@/interface/deals.interface";
+import { TDealPayloadProduct, TDealProduct } from "@/interface/deals.interface";
 import Pagination from "../ui/pagination";
 import { Input } from "../ui/input";
 import {
@@ -30,11 +26,10 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { Trash } from "lucide-react";
 import { toast } from "sonner";
-import { SheetClose } from "../ui/sheet";
 import { globalError } from "@/lib/utils";
 
 const AddProductsToDeal = ({ dealId }: { dealId: string }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -56,8 +51,7 @@ const AddProductsToDeal = ({ dealId }: { dealId: string }) => {
     { skip: !dealId },
   );
 
-  const [addProducts, { isLoading: isSubmitting }] =
-    useAddProductsToDealMutation();
+  const [addProducts] = useAddProductsToDealMutation();
 
   const handleAddProduct = async () => {
     try {
@@ -180,7 +174,7 @@ const AddProductsToDeal = ({ dealId }: { dealId: string }) => {
     {
       accessorKey: "_id",
       id: "_id",
-      header: ({ column }) => (
+      header: ({ column: _column }) => (
         <Checkbox
           checked={checkIfAllSelected()}
           onCheckedChange={handleSelectUnselectAll}

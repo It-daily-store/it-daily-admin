@@ -27,7 +27,7 @@ const orderApi = baseApi.injectEndpoints({
         url: `/order/single/${id}`,
         method: "GET",
       }),
-      providesTags: (arg) => [{ type: tagTypes.orders }],
+      providesTags: (_arg) => [{ type: tagTypes.orders }],
     }),
   }),
 });

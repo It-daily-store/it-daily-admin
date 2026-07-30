@@ -24,7 +24,6 @@ import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
 
 import { toast } from "sonner";
-import { useAppDispatch } from "@/redux/hooks";
 import {
   useCreateFolderMutation,
   useDeleteFolderMutation,
@@ -45,7 +44,6 @@ import {
   Cloudy,
   Folder,
   FolderPlus,
-  ListCheck,
   ListChecks,
   LoaderCircle,
   Pencil,
@@ -92,7 +90,6 @@ const ImageGallery = ({
     useUploadImageMutation();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const uploadImageRef = useRef<HTMLInputElement | null>(null);
-  const dispatch = useAppDispatch();
   const [parentFolder, setParentFolder] = useState("");
   const {
     data: folders,

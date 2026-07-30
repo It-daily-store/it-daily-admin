@@ -1,5 +1,5 @@
 "use client";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useAppDispatch } from "@/redux/hooks";
 import React, { ReactNode, useEffect, useState } from "react";
 import AddBasicData from "@/components/product/createProduct/AddBasicData";
 import AddSpecifications from "@/components/product/createProduct/AddSpecifications";

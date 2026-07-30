@@ -2,24 +2,18 @@
 
 import React, {
   ForwardRefExoticComponent,
-  ReactNode,
   RefAttributes,
   useEffect,
   useState,
 } from "react";
 import {
-  BookOpen,
   ChevronRight,
   Computer,
-  FileText,
-  GalleryHorizontalEnd,
-  GalleryVerticalEnd,
   LayoutDashboard,
   LucideProps,
   Package,
   Settings,
   ShoppingBasket,
-  Store,
 } from "lucide-react";
 
 import {
@@ -39,10 +33,8 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { useTheme } from "next-themes";
-import { useAppSelector } from "@/redux/hooks";
 import { usePathname } from "next/navigation";
 import {
-  ChevronDown,
   DiamondPlusIcon,
   GalleryVertical,
   HardDriveUpload,
@@ -55,7 +47,6 @@ import {
   UserPen,
   Users,
   UsersRound,
-  X,
 } from "lucide-react";
 import {
   Collapsible,
@@ -210,9 +201,8 @@ const menus: TMenu[] = [
 ];
 
 export function AppSidebar() {
-  const { user } = useAppSelector((state) => state.auth);
   const pathName = usePathname();
-  const [openRoute, setOpenRoute] = useState<number[]>([]);
+  const [, setOpenRoute] = useState<number[]>([]);
   const { state } = useSidebar();
 
   useEffect(() => {

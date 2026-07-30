@@ -1,8 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import ImageGallery from "../ImageGallery";
 import { useGetAllCategoriesQuery } from "@/redux/api/categories";
@@ -10,7 +9,6 @@ import TreeDropdown, {
   TSelectCategory,
 } from "@/components/custom/TreeDropdown";
 import { useGetAllBrandsQuery } from "@/redux/api/brandApi";
-import { TSelectOptions } from "@/components/categories/interface";
 import { TBrand } from "@/interface/brand.interface";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn, isValidUrl } from "@/lib/utils";
@@ -25,7 +23,6 @@ import { generateCategoryTree } from "@/components/utilities/category/categoryUt
 import { X } from "lucide-react";
 import { TFilter } from "@/interface/product.filter";
 import { Combobox } from "@/components/ui/combobox";
-import { Textarea } from "@/components/ui/textarea";
 import { TCategory, TProductCategory } from "@/interface/category";
 import {
   Select,
@@ -45,7 +42,6 @@ const AddBasicData = ({
   product: TProduct;
   updateProduct: (key: keyof TProduct, value: TProduct[keyof TProduct]) => void;
 }) => {
-  const dispatch = useAppDispatch();
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [thumbOpen, setThumbOpen] = useState(false);
   const { data: categoryData } = useGetAllCategoriesQuery(undefined);

@@ -2,15 +2,12 @@
 
 import { Textarea } from "@/components/ui/textarea";
 
-import { TCategory, TProductCategory } from "@/interface/category";
 import { TProduct, TProductAttribute } from "@/interface/product.interface";
 import { globalError } from "@/lib/utils";
 import { useGetAllCategoriesQuery } from "@/redux/api/categories";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import React, { useEffect } from "react";
+import React from "react";
 
 const AddSpecifications = ({
-  edit,
   product,
   updateProduct,
 }: {
@@ -19,13 +16,10 @@ const AddSpecifications = ({
   updateProduct: (key: keyof TProduct, value: TProduct[keyof TProduct]) => void;
 }) => {
   const {
-    data: categoryData,
     error: cateoryError,
     // isLoading: categoryLoading,
   } = useGetAllCategoriesQuery(undefined);
   const { attributes } = product;
-
-  const currentProduct = product;
 
   if (cateoryError) {
     globalError(cateoryError);

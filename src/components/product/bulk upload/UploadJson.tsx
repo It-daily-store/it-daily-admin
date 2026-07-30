@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Combobox, Option } from "@/components/ui/combobox";
 import { MultiSelect } from "@/components/ui/multiselect";
 import { TFilter } from "@/interface/product.filter";
-import { useGetAllBrandsQuery } from "@/redux/api/brandApi";
 import { useGetAllCategoriesQuery } from "@/redux/api/categories";
 import { useGetAllProductFiltersQuery } from "@/redux/api/filtersApi";
 import { useDownloadJsonTemplateMutation } from "@/redux/api/productApi";

@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { store } from "@/redux/store";
 import { resetAuthData } from "@/redux/reducers/auth/authSlice";
 import { clearCookie } from "@/actions/logout";
-import { TProduct } from "@/interface/product.interface";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -47,7 +46,7 @@ export function isValidUrl(url: string): boolean {
     new URL(url);
 
     return true;
-  } catch (_) {
+  } catch {
     // Invalid URL format
     return false;
   }

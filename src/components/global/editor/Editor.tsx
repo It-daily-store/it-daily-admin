@@ -41,11 +41,7 @@ import {
   ListOrdered,
   LinkIcon,
   Link2OffIcon as LinkOff,
-  ImageIcon,
-  Upload,
   Quote,
-  Code2,
-  Minus,
   Undo,
   Redo,
 } from "lucide-react";
@@ -548,8 +544,8 @@ const Editor: React.FC<TipTapEditorProps> = ({
   className = "",
   placeholder = "Start typing...",
 }) => {
-  const [showMenu, setShowMenu] = React.useState(true);
-  const [isEditable, setIsEditable] = React.useState(true);
+  const [showMenu] = React.useState(true);
+  const [isEditable] = React.useState(true);
 
   const editor = useEditor({
     extensions,

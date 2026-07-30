@@ -1,5 +1,4 @@
 import {
-  TCategory,
   TProductCategory,
   TTreeCategory,
   TUpdateCategory,
@@ -13,7 +12,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { MultiSelect, Option } from "../ui/multiselect";
+import { MultiSelect } from "../ui/multiselect";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,7 +21,6 @@ import { toast } from "sonner";
 import { useUpdateCategoryMutation } from "@/redux/api/categories";
 import { useGetDetailsCategoriesQuery } from "@/redux/api/detailsCategory";
 import ImageSelect from "../common/ImageSelect";
-import { Checkbox } from "../ui/checkbox";
 import {
   Select,
   SelectContent,

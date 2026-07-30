@@ -11,7 +11,7 @@ import { useGetAllBrandsQuery } from "@/redux/api/brandApi";
 import { useGetAllCategoriesQuery } from "@/redux/api/categories";
 import { useGetAllProductsQuery } from "@/redux/api/productApi";
 import { useGetAllAdminsQuery } from "@/redux/api/usersApi";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 dayjs.extend(utc);
 import React, { useState } from "react";
@@ -19,7 +19,6 @@ import { useRouter } from "nextjs-toploader/app";
 import PageHeader from "@/components/common/PageHeader";
 import AllProductsGridView from "@/components/product/all-product/AllProductsGridView";
 import ProductSkeleton from "@/components/product/all-product/ProductSkeleton";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import UserCard from "@/components/common/UserCard";
 import { Grid3X3, Sheet } from "lucide-react";
 import GlobalTable, {
@@ -30,15 +29,14 @@ import Image from "next/image";
 const AllProducts = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
-  const [createdBy, setCreatedBy] = useState("");
-  const [brand, setBrand] = useState("");
+  const [createdBy] = useState("");
+  const [brand] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [category, setCategory] = useState("");
+  const [category] = useState("");
   const [createdAt, setCreateAt] = useState<Date | null>(null);
   const debouncedSearchTerm = useDebounce(searchTerm);
   const {
     data: productData,
-    error,
     isLoading,
     isFetching,
   } = useGetAllProductsQuery(
@@ -55,13 +53,12 @@ const AllProducts = () => {
       pollingInterval: 300000,
     },
   );
-  const { data: adminData } = useGetAllAdminsQuery(undefined);
-  const { data: brandData } = useGetAllBrandsQuery(undefined);
-  const { data: categoryData } = useGetAllCategoriesQuery(undefined);
+  useGetAllAdminsQuery(undefined);
+  useGetAllBrandsQuery(undefined);
+  useGetAllCategoriesQuery(undefined);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const paginationData = productData?.pagination;
   const router = useRouter();
-  const dispatch = useAppDispatch();
 
   const columns: TCustomColumnDef<TProduct>[] = [
     {

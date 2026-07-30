@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useGetAllBrandsQuery } from "@/redux/api/brandApi";
 import { useGetAllCategoriesQuery } from "@/redux/api/categories";
-import { Cloud, CloudUpload, DownloadIcon, Trash } from "lucide-react";
+import { CloudUpload, DownloadIcon, Trash } from "lucide-react";
 import React, {
   ChangeEvent,
   Dispatch,

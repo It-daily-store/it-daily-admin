@@ -3,12 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 import { Eye, Loader, Pencil, Plus, Trash2 } from "lucide-react";
 
 const buttonVariants = cva(
@@ -65,8 +60,7 @@ type TExtraProps = {
   tooltip?: string;
 };
 export interface ButtonProps
-  extends
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     TExtraProps,
     TButtonVariants {
   asChild?: boolean;

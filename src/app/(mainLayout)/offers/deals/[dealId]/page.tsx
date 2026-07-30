@@ -19,7 +19,7 @@ import { calculateDiscountPrice } from "@/utils/product.utis";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 
 const AddProductsToDealPage = () => {
   const params = useParams();
@@ -93,10 +93,6 @@ const AddProductsToDealPage = () => {
       header: "Discount",
       cell: ({ row }) => {
         const discount = row.original.discount;
-        const discountPrice = calculateDiscountPrice(
-          row.original.productId?.price,
-          discount,
-        );
         return (
           <div>
             {/* <p className="text-black font-medium">${discountPrice}</p> */}

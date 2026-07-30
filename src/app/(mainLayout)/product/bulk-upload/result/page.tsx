@@ -21,10 +21,8 @@ import {
   TBulkUploadHistory,
   TSuccessData,
 } from "@/interface/bulkupload.interface";
-import { TCategory } from "@/interface/category";
 import { globalError } from "@/lib/utils";
 import { useGetAllUploadHistoryQuery } from "@/redux/api/bulkUploadApi";
-import { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";

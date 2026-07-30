@@ -3,7 +3,6 @@
 import type { TDeal } from "@/interface/deals.interface";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import CustomAvatar from "@/components/custom/CustomAvatar";
 import UserCard from "@/components/common/UserCard";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";

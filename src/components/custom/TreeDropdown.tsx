@@ -2,7 +2,6 @@ import { TCategory, TTreeCategory } from "@/interface/category";
 import { cn } from "@/lib/utils";
 import { useGetAllCategoriesQuery } from "@/redux/api/categories";
 import React, { useEffect, useState } from "react";
-import { generateCategoryTree } from "../utilities/category/categoryUtils";
 import { ChevronDown } from "lucide-react";
 
 export interface TSelectCategory {

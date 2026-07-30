@@ -1,5 +1,4 @@
 import { TMapedField } from "@/app/(mainLayout)/product/bulk-upload/page";
-import { TSelectOptions } from "@/components/categories/interface";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Papa from "papaparse";
 import { Combobox, Option } from "@/components/ui/combobox";

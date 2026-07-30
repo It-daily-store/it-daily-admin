@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,6 @@ export function Combobox({
   searchPlaceholder,
   emptyPlaceholder,
   extraContent,
-  customClassName,
 }: {
   value: string;
   onChange: (_: string) => void;
@@ -47,7 +46,6 @@ export function Combobox({
   searchPlaceholder?: string;
   emptyPlaceholder?: string;
   extraContent?: React.ReactNode;
-  customClassName?: string;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -108,7 +106,7 @@ export function Combobox({
                 <CommandItem
                   key={framework.value}
                   value={framework.searchValue}
-                  onSelect={(currentValue) => {
+                  onSelect={(_currentValue) => {
                     onChange(framework.value);
                     setOpen(false);
                   }}

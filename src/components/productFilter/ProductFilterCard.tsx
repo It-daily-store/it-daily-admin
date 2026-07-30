@@ -1,4 +1,3 @@
-import { TCreateProductFilter } from "@/redux/api/filtersApi";
 import React, { Dispatch, SetStateAction } from "react";
 import { Button } from "../ui/button";
 import { TFilter } from "@/interface/product.filter";

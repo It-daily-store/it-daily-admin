@@ -16,7 +16,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { ColumnDef, ColumnSizingState, Table } from "@tanstack/react-table";
+import { ColumnSizingState, Table } from "@tanstack/react-table";
 import RightArrowCircle from "@/components/svgs/common/RightArrowCircle";
 import {
   closestCenter,
@@ -31,7 +31,6 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import DragIcon from "@/components/svgs/common/DragIcon";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { CSS } from "@dnd-kit/utilities";
@@ -39,11 +38,6 @@ import { EyeOff, GripVertical } from "lucide-react";
 import { TCustomColumnDef } from "./GlobalTable";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setColumnSizing } from "@/redux/reducers/tableCollumn/tableReducer";
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-} from "@/components/ui/alert-dialog";
 
 type TProps = {
   open: boolean;
@@ -58,7 +52,7 @@ type ColumnProps = {
 };
 
 function Column({ id, children }: ColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: id,
   });
 
@@ -76,7 +70,7 @@ const DraggableItem = ({
   col,
   preview = false,
   onClick,
-  table,
+  table: _table,
 }: {
   col: TCustomColumnDef<any>;
   preview?: boolean;

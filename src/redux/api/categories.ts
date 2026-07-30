@@ -21,7 +21,11 @@ const categoriesApi = baseApi.injectEndpoints({
 
       async onCacheEntryAdded(
         arg,
-        { cacheDataLoaded, cacheEntryRemoved, updateCachedData },
+        {
+          cacheDataLoaded,
+          cacheEntryRemoved: _cacheEntryRemoved,
+          updateCachedData,
+        },
       ) {
         try {
           await cacheDataLoaded;

@@ -34,7 +34,7 @@ const Modal = React.forwardRef<HTMLDivElement, TProps>(
       showCloseButton = true,
       ...rest
     },
-    ref,
+    _ref,
   ) => {
     return (
       <Dialog modal open={open} {...rest}>

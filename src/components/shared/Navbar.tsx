@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useAppSelector } from "@/redux/hooks";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useEffect, useState } from "react";
@@ -16,7 +16,6 @@ const Navbar = () => {
   const [loaded, setLoaded] = useState(false);
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
   const [galleryOpen, setGalleryOpen] = useState(false);
-  const dispatch = useAppDispatch();
 
   const { theme, setTheme } = useTheme();
 

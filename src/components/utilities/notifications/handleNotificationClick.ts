@@ -1,7 +1,4 @@
 import { TNotification } from "@/interface/notification.interface";
-import { baseApi } from "@/redux/api/baseApi";
-import { tagTypes } from "@/redux/api/tagTypes";
-import { store } from "@/redux/store";
 
 // const findTag = (noti: TNotification) => {
 //     switch (noti.notificationType) {
@@ -32,7 +29,6 @@ export const handleNotificationClick = (
   noti: TNotification,
   gotToRoute: (_: string) => void,
 ) => {
-  const { user } = store.getState().auth;
   console.log(noti);
   if (noti?.notificationType === "category") {
     gotToRoute("/category");

@@ -13,7 +13,7 @@ import { TDeal } from "@/interface/deals.interface";
 import { useGetAllDealsQuery } from "@/redux/api/dealsApi";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { Eye, LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List } from "lucide-react";
 import Link from "next/link";
 dayjs.extend(utc);
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,12 +22,12 @@ import React, { useState } from "react";
 const DealsPage = () => {
   const searchParams = useSearchParams();
   const view = searchParams.get("view");
-  const [pagination, setPagination] = useState({
+  const [pagination] = useState({
     page: 1,
     limit: 10,
     total: 0,
   });
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [createDealOpen, setCreateDealOpen] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState<TDeal | null>(null);

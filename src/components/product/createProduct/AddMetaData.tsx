@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { useAppSelector } from "@/redux/hooks";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import ImageGallery from "../ImageGallery";
 import { Button } from "@/components/ui/button";
 import { isValidUrl } from "@/lib/utils";
@@ -10,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { TProduct } from "@/interface/product.interface";
 
 const AddMetaData = ({
-  edit,
   product,
   updateProduct,
 }: {

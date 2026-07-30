@@ -1,5 +1,4 @@
 import { TUser } from "./auth.interface";
-import { TCategory } from "./category";
 
 export interface PcPart {
   id: number;

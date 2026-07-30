@@ -1,11 +1,9 @@
 // import Divider from '@/components/custom/Divider'
-import { TSelectOptions } from "@/components/categories/interface";
 import Modal from "@/components/custom/Modal";
 import { Button } from "@/components/ui/button";
 import { Combobox, Option } from "@/components/ui/combobox";
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { TRole } from "@/interface/auth.interface";
 import { globalError } from "@/lib/utils";
 import { useGetRolesQuery } from "@/redux/api/rolesApi";

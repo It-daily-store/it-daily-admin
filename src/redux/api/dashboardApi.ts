@@ -3,7 +3,7 @@ import { baseApi } from "./baseApi";
 const dashboardApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getDashboarAnalytics: build.query({
-      query: (year?: string) => ({
+      query: (_year?: string) => ({
         url: "/dashboard",
         method: "GET",
       }),
