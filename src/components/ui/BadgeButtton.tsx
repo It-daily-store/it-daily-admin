@@ -11,18 +11,14 @@ type TProps = {
   variant?: TButtonVariants["variant"];
 };
 
-const BadgeButtton = ({
-  className,
-  tooptip,
-  count,
-  icon,
-  text,
-  variant,
-  ...rest
-}: TProps & ButtonHTMLAttributes<HTMLButtonElement>) => {
+const BadgeButtton = React.forwardRef<
+  HTMLButtonElement,
+  TProps & ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, tooptip, count, icon, text, variant, ...rest }, ref) => {
   return (
     <div className="relative">
       <Button
+        ref={ref}
         {...rest}
         tooltip={tooptip}
         variant={variant || "edit"}
@@ -40,6 +36,7 @@ const BadgeButtton = ({
       </div>
     </div>
   );
-};
+});
+BadgeButtton.displayName = "BadgeButtton";
 
 export default BadgeButtton;

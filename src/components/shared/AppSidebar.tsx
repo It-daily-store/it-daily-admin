@@ -9,11 +9,13 @@ import React, {
 import {
   ChevronRight,
   Computer,
+  GalleryHorizontalEnd,
   LayoutDashboard,
   LucideProps,
   Package,
   Settings,
   ShoppingBasket,
+  Store,
 } from "lucide-react";
 
 import {
@@ -27,6 +29,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
+  SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarRail,
   useSidebar,
@@ -171,7 +174,7 @@ const menus: TMenu[] = [
     ],
   },
   {
-    id: 8,
+    id: 9,
     title: "Settings",
     link: "/settings",
     icon: Settings,
@@ -184,20 +187,20 @@ const menus: TMenu[] = [
       },
     ],
   },
-  // {
-  //   id: 11,
-  //   title: "Shop",
-  //   icon: Store,
-  //   link: "/shop",
-  //   children: [
-  //     {
-  //       id: 1,
-  //       title: "Banner Builder",
-  //       link: "/shop/banner-builder",
-  //       icon: GalleryHorizontalEnd,
-  //     },
-  //   ],
-  // },
+  {
+    id: 11,
+    title: "Shop",
+    icon: Store,
+    link: "/shop",
+    children: [
+      {
+        id: 1,
+        title: "Banner Builder",
+        link: "/shop/banner-builder",
+        icon: GalleryHorizontalEnd,
+      },
+    ],
+  },
 ];
 
 export function AppSidebar() {
@@ -219,6 +222,24 @@ export function AppSidebar() {
     }
     return pathName.substring(1) === link.substring(1);
   };
+
+  function renderSubMenu(menu: TMenu) {
+    const active = isLinkActive(menu.link);
+    return (
+      <SidebarMenuSubItem key={menu.id}>
+        <SidebarMenuSubButton
+          asChild
+          isActive={active}
+          className={active ? "hover:bg-transparent hover:text-pure-white" : ""}
+        >
+          <Link href={menu.link} className="flex items-center gap-2">
+            <menu.icon className="text-inherit" size={18} />
+            {menu.title}
+          </Link>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    );
+  }
 
   function renderMenu(menu: TMenu) {
     const active = isLinkActive(menu.link);
@@ -247,11 +268,7 @@ export function AppSidebar() {
               className={active ? "hover:bg-transparent" : ""}
             >
               <SidebarMenuSub>
-                {menu.children.map((item) => (
-                  <SidebarMenuSubItem key={item.id}>
-                    {renderMenu(item)}
-                  </SidebarMenuSubItem>
-                ))}
+                {menu.children.map((item) => renderSubMenu(item))}
               </SidebarMenuSub>
             </CollapsibleContent>
           </Collapsible>
@@ -263,11 +280,9 @@ export function AppSidebar() {
             tooltip={menu.title}
             asChild
           >
-            <Link href={menu.link} className="block">
-              <SidebarMenuSubItem className="flex gap-2">
-                <menu.icon className="text-inherit" size={18} />
-                {menu.title}
-              </SidebarMenuSubItem>
+            <Link href={menu.link} className="flex items-center gap-2">
+              <menu.icon className="text-inherit" size={18} />
+              {menu.title}
             </Link>
           </SidebarMenuButton>
         )}
@@ -312,13 +327,11 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>{menus.map((menu) => renderMenu(menu))}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>{menus.map((menu) => renderMenu(menu))}</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter />
       <SidebarRail />

@@ -126,7 +126,7 @@ const NotificationMenu = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="outline-none">
+      <DropdownMenuTrigger asChild>
         <BadgeButtton
           variant={"bordered"}
           className="size-8 bg-background"
