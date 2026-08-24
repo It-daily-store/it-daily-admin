@@ -1,5 +1,5 @@
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
-import type { AxiosRequestConfig, AxiosError } from "axios";
+import type { AxiosRequestConfig, AxiosError, AxiosProgressEvent } from "axios";
 import axiosInstance from "./axiosInstance";
 
 export const axiosBaseQuery =
@@ -13,11 +13,20 @@ export const axiosBaseQuery =
       params?: AxiosRequestConfig["params"];
       headers?: AxiosRequestConfig["headers"];
       contentType?: string;
+      onUploadProgress?: (progressEvent: AxiosProgressEvent) => void;
     },
     unknown,
     unknown
   > =>
-  async ({ url, method, data, params, headers, contentType }) => {
+  async ({
+    url,
+    method,
+    data,
+    params,
+    headers,
+    contentType,
+    onUploadProgress,
+  }) => {
     try {
       const result = await axiosInstance({
         url: baseUrl + url,
@@ -32,6 +41,7 @@ export const axiosBaseQuery =
                 "Content-Type": contentType || "application/json",
               }),
         },
+        onUploadProgress,
       });
       return { data: result.data };
     } catch (axiosError) {
