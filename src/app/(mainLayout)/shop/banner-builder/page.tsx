@@ -1,33 +1,254 @@
 "use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 
-import { BannerBuilder } from "@it-daily-store/banner/builder";
-import ImageSelect from "@/components/common/ImageSelect";
-import { useAppSelector } from "@/redux/hooks";
-import { getAccessToken } from "@/lib/utils";
-import { EAppFeatures } from "@/interface/auth.interface";
+import {
+  TBannerTemplateSummary,
+  useDeleteTemplateMutation,
+  useDuplicateTemplateMutation,
+  useGetAllTemplatesQuery,
+  useRenameTemplateMutation,
+  useSetTemplateActiveMutation,
+} from "@/redux/api/bannerApi";
+import { globalError } from "@/lib/utils";
+import { toast } from "sonner";
 import PageHeader from "@/components/common/PageHeader";
+import GlobalTable, {
+  TCustomColumnDef,
+} from "@/components/common/GlobalTable/GlobalTable";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import DeleteModal from "@/components/global/DeleteModal";
+import Modal from "@/components/custom/Modal";
+import { Input } from "@/components/ui/input";
+import CreateBannerTemplate from "@/components/banner/CreateBannerTemplate";
+import { useAppSelector } from "@/redux/hooks";
+import { EAppFeatures } from "@/interface/auth.interface";
 
-export default function BannerBuilderPage() {
+const BannerBuilderPage = () => {
+  const router = useRouter();
   const { permissions } = useAppSelector((state) => state.auth);
   const bannerPermission = permissions?.find(
     (p) => p.feature === EAppFeatures.banner,
   );
 
+  const {
+    data: templateData,
+    isLoading,
+    error,
+  } = useGetAllTemplatesQuery(undefined);
+  const [deleteOpen, setDeleteOpen] = useState<string | null>(null);
+  const [renameTarget, setRenameTarget] =
+    useState<TBannerTemplateSummary | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+  const [deleteTemplate, { isLoading: isDeleting }] =
+    useDeleteTemplateMutation();
+  const [renameTemplate, { isLoading: isRenaming }] =
+    useRenameTemplateMutation();
+  const [duplicateTemplate] = useDuplicateTemplateMutation();
+  const [setTemplateActive, { isLoading: isSettingActive }] =
+    useSetTemplateActiveMutation();
+
+  if (!isLoading && error) {
+    globalError(error);
+  }
+
+  const handleDelete = async () => {
+    if (!deleteOpen) return;
+    try {
+      const res = await deleteTemplate(deleteOpen).unwrap();
+      toast.success(res.message);
+      setDeleteOpen(null);
+    } catch (err) {
+      globalError(err);
+    }
+  };
+
+  const handleRename = async () => {
+    if (!renameTarget) return;
+    try {
+      const res = await renameTemplate({
+        id: renameTarget._id,
+        name: renameValue,
+      }).unwrap();
+      toast.success(res.message);
+      setRenameTarget(null);
+      setRenameValue("");
+    } catch (err) {
+      globalError(err);
+    }
+  };
+
+  const handleDuplicate = async (id: string) => {
+    try {
+      const res = await duplicateTemplate(id).unwrap();
+      toast.success(res.message);
+    } catch (err) {
+      globalError(err);
+    }
+  };
+
+  const handleToggleActive = async (template: TBannerTemplateSummary) => {
+    try {
+      const res = await setTemplateActive({
+        id: template._id,
+        is_active: !template.is_active,
+      }).unwrap();
+      toast.success(res.message);
+    } catch (err) {
+      globalError(err);
+    }
+  };
+
+  const defaultColumns: TCustomColumnDef<TBannerTemplateSummary>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => <p>{row.original.name}</p>,
+      id: "name",
+      minSize: 200,
+      visible: true,
+      canHide: false,
+    },
+    {
+      accessorKey: "is_active",
+      header: "Active",
+      // Every switch is disabled while any activation is in flight, not just
+      // the row being toggled: activation is exclusive server-side, so two
+      // overlapping toggles would race over the single active slot.
+      cell: ({ row }) =>
+        bannerPermission?.access.update ? (
+          <Switch
+            checked={row.original.is_active}
+            disabled={isSettingActive}
+            onCheckedChange={() => handleToggleActive(row.original)}
+            aria-label={`Show "${row.original.name}" on the storefront`}
+          />
+        ) : (
+          <Badge variant={row.original.is_active ? "default" : "secondary"}>
+            {row.original.is_active ? "Active" : "Inactive"}
+          </Badge>
+        ),
+      id: "is_active",
+      minSize: 110,
+      visible: true,
+      canHide: false,
+    },
+    {
+      accessorKey: "updatedAt",
+      header: "Last updated",
+      cell: ({ row }) => (
+        <p>{dayjs(row.original.updatedAt).format("MMM D, YYYY h:mm A")}</p>
+      ),
+      id: "updatedAt",
+      minSize: 180,
+      visible: true,
+      canHide: false,
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() =>
+              router.push(`/shop/banner-builder/${row.original._id}`)
+            }
+            variant={"edit_button"}
+            size={"base"}
+          ></Button>
+          {bannerPermission?.access.update && (
+            <Button
+              variant={"outline"}
+              size={"base"}
+              onClick={() => {
+                setRenameTarget(row.original);
+                setRenameValue(row.original.name);
+              }}
+            >
+              Rename
+            </Button>
+          )}
+          {bannerPermission?.access.create && (
+            <Button
+              variant={"outline"}
+              size={"base"}
+              onClick={() => handleDuplicate(row.original._id)}
+            >
+              Duplicate
+            </Button>
+          )}
+          {bannerPermission?.access.delete && (
+            <Button
+              onClick={() => setDeleteOpen(row.original._id)}
+              variant={"delete_button"}
+              size={"base"}
+            ></Button>
+          )}
+        </div>
+      ),
+      id: "actions",
+      minSize: 260,
+      visible: true,
+      canHide: false,
+    },
+  ];
+
   return (
-    <div className="space-y-4">
+    <>
       <PageHeader
         title="Banner Builder"
-        subtitle="Create and edit freeform banner templates for the storefront"
+        subtitle="Create and edit freeform banner templates. The storefront shows the one marked active — activating a template replaces the previous one."
+        buttons={
+          bannerPermission?.access.create ? <CreateBannerTemplate /> : undefined
+        }
       />
-      <BannerBuilder
-        apiBaseUrl={`${process.env.NEXT_PUBLIC_URL}/banner`}
-        getAuthHeaders={(): Record<string, string> => {
-          const token = getAccessToken();
-          return token ? { Authorization: token } : {};
+
+      <GlobalTable
+        tableName="banner_templates_table"
+        data={templateData?.data || []}
+        defaultColumns={defaultColumns}
+        isLoading={isLoading}
+        limit={20}
+      />
+
+      <Modal
+        open={renameTarget !== null}
+        onOpenChange={() => {
+          setRenameTarget(null);
+          setRenameValue("");
         }}
-        canEdit={!!bannerPermission?.access.update}
-        imagePicker={ImageSelect}
-      />
-    </div>
+        title="Rename template"
+      >
+        <div className="flex flex-col gap-4">
+          <Input
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            placeholder="Template name"
+          />
+          <Button loading={isRenaming} onClick={handleRename}>
+            Save
+          </Button>
+        </div>
+      </Modal>
+
+      <DeleteModal
+        open={deleteOpen !== null}
+        onOpenChange={() => setDeleteOpen(null)}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
+        title="Delete banner template"
+      >
+        <p className="text-gray">
+          This is a destructive action and cannot be undone. If this template is
+          the active one, the storefront will show no banner until you activate
+          another.
+        </p>
+      </DeleteModal>
+    </>
   );
-}
+};
+
+export default BannerBuilderPage;
