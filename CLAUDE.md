@@ -91,3 +91,7 @@ When adding a new CRUD feature, replicate this whole chain: add a `tagTypes` ent
 - ESLint (`eslint.config.mjs`, flat config extending `next/core-web-vitals` + `next/typescript`) intentionally disables `no-unused-vars`, `@typescript-eslint/no-explicit-any`, and several stylistic rules — this codebase does not enforce strict `any`-avoidance despite the general engineering guidance to prefer types; match existing file style rather than over-annotating.
 - HTTP goes through `src/lib/axiosInstance.ts` (axios instance with interceptors) — never call `fetch`/`axios` directly in components; always go through an RTK Query endpoint in `src/redux/api/`.
 - Realtime: `src/lib/socket.ts` exports `socket`, `connectSocket`, `disconnectSocket`; sockets are connected once in `MainLayout` and individual API slices subscribe to specific events inside `onCacheEntryAdded`.
+
+## Code comments
+
+Do not comment everywhere. Add a comment only where the code cannot explain itself (a non-obvious workaround, a business rule, a deliberate edge case), and keep it to a single line.
