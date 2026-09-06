@@ -8,9 +8,17 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import ImageGallery from "../product/ImageGallery";
 import NotificationMenu from "../notifications/NotificationMenu";
-import { CircleUserRound, Images, Moon, Settings, Sun } from "lucide-react";
+import {
+  CircleUserRound,
+  Images,
+  LogOut,
+  Moon,
+  Settings,
+  Sun,
+} from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
 import GlobalDropdown from "../common/GlobalDropdown";
+import { handleLogout } from "@/lib/utils";
 
 const Navbar = () => {
   const [loaded, setLoaded] = useState(false);
@@ -19,9 +27,17 @@ const Navbar = () => {
 
   const { theme, setTheme } = useTheme();
 
+  const [loggingOut, setLoggingOut] = useState(false);
+
   useEffect(() => {
     setLoaded(true);
   }, []);
+
+  const onLogout = async () => {
+    setLoggingOut(true);
+    await handleLogout();
+    setLoggingOut(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50">
@@ -57,6 +73,13 @@ const Navbar = () => {
                       <Settings size={18} />
                       <span>Settings</span>
                     </Link>
+                    <button
+                      onClick={onLogout}
+                      className="flex w-full items-center gap-3 rounded-md text-left px-2 py-1.5 text-sm hover:bg-background-foreground cursor-pointer"
+                    >
+                      <LogOut size={18} />
+                      <span>{loggingOut ? "Logging out..." : "Logout"}</span>
+                    </button>
                   </>
                 }
                 title={
