@@ -226,14 +226,21 @@ export function AppSidebar() {
   function renderSubMenu(menu: TMenu) {
     const active = isLinkActive(menu.link);
     return (
-      <SidebarMenuSubItem key={menu.id}>
+      <SidebarMenuSubItem key={menu.id} className="group/sub-menu-item">
         <SidebarMenuSubButton
           asChild
           isActive={active}
-          className={active ? "hover:bg-transparent hover:text-pure-white" : ""}
+          className={
+            active
+              ? "hover:bg-transparent hover:text-pure-white"
+              : "text-dark-gray"
+          }
         >
           <Link href={menu.link} className="flex items-center gap-2">
-            <menu.icon className="text-inherit" size={18} />
+            <menu.icon
+              className="text-dark group-hover/sub-menu-item:text-pure-white"
+              size={18}
+            />
             {menu.title}
           </Link>
         </SidebarMenuSubButton>
@@ -258,9 +265,17 @@ export function AppSidebar() {
             defaultOpen={parentActive}
           >
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton tooltip={menu.title}>
-                <menu.icon className="text-inherit" size={18} />
-                <span className="text-inherit">{menu.title}</span>
+              <SidebarMenuButton
+                tooltip={menu.title}
+                className="group/collapsible-trigger"
+              >
+                <menu.icon
+                  className=" text-black group-hover/collapsible-trigger:text-sidebar-accent-foreground"
+                  size={18}
+                />
+                <span className="text-black group-hover/collapsible-trigger:text-sidebar-accent-foreground">
+                  {menu.title}
+                </span>
                 <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
               </SidebarMenuButton>
             </CollapsibleTrigger>
@@ -274,14 +289,21 @@ export function AppSidebar() {
           </Collapsible>
         ) : (
           <SidebarMenuButton
-            className={
-              active ? "hover:bg-transparent hover:text-pure-white" : ""
-            }
+            className={cn(
+              active ? "hover:bg-transparent hover:text-pure-white" : "",
+              "group/menu-item",
+            )}
             tooltip={menu.title}
             asChild
           >
             <Link href={menu.link} className="flex items-center gap-2">
-              <menu.icon className="text-inherit" size={18} />
+              <menu.icon
+                className={cn(
+                  " text-black group-hover/menu-item:text-pure-white",
+                  isLinkActive(menu.link) && "text-sidebar-accent-foreground",
+                )}
+                size={18}
+              />
               {menu.title}
             </Link>
           </SidebarMenuButton>

@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import {
   DropdownMenu,
@@ -6,16 +7,20 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useGetNotificationsQuery } from "@/redux/api/notificationApi";
-import UserCard from "../common/UserCard";
-import dayjs from "../utilities/Customdayjs";
 import { TNotification } from "@/interface/notification.interface";
 import { socket } from "@/lib/socket";
 import { toast } from "sonner";
 import { Skeleton } from "../ui/skeleton";
-import { handleNotificationClick } from "../utilities/notifications/handleNotificationClick";
 import { useRouter } from "nextjs-toploader/app";
-import { Bell } from "lucide-react";
+import { Bell, BellOff } from "lucide-react";
 import BadgeButtton from "../ui/BadgeButtton";
+import { useAppSelector } from "@/redux/hooks";
+import NotificationItem from "./NotificationItem";
+import { resolveNotificationRoute } from "./resolveNotificationRoute";
+import {
+  buildNotificationMessage,
+  flattenMessage,
+} from "./buildNotificationMessage";
 
 const NotificationMenu = () => {
   const [page, setPage] = useState(1);
@@ -30,47 +35,45 @@ const NotificationMenu = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
-
-  const goToRoute = (route: string) => {
-    router.push(route);
-  };
+  const { user } = useAppSelector((state) => state.auth);
+  const currentUserId = user?._id;
+  const currentUserIdRef = useRef(currentUserId);
+  currentUserIdRef.current = currentUserId;
 
   const handleClick = (noti: TNotification) => {
     if (!noti.opened) {
       socket?.emit("notificationClicked", noti._id);
     }
 
-    handleNotificationClick(noti, goToRoute);
+    const route = resolveNotificationRoute(noti);
+    if (route) {
+      router.push(route);
+    }
   };
 
   useEffect(() => {
     const handleNewNoti = (payload: TNotification) => {
-      console.log({ payload });
       const audio = new Audio("/notification_2.wav");
       audio.play().catch((err) => console.log(err));
-      toast(payload.text || "new notification", {
-        position: "bottom-right",
-      });
+
+      const message = flattenMessage(
+        buildNotificationMessage(payload, currentUserIdRef.current),
+      );
+      toast(message || "New notification", { position: "bottom-right" });
 
       setNotifications((prev) => [payload, ...prev]);
       setUnreadCount((prev) => prev + 1);
     };
 
-    const handleRead = (data: TNotification) => {
-      const markedNoti = notifications?.find((noti) => noti?._id === data?._id);
-      if (markedNoti) {
-        setNotifications(
-          (prev) =>
-            prev.map((noti: TNotification) => {
-              if (noti?._id === markedNoti?._id) {
-                return { ...markedNoti, opened: true };
-              } else {
-                return noti;
-              }
-            }) || [],
-        );
-        setUnreadCount((prev) => prev - 1);
-      }
+    const handleRead = (updated: TNotification) => {
+      if (!updated?._id) return;
+
+      setNotifications((prev) =>
+        prev.map((noti) =>
+          noti._id === updated._id ? { ...noti, opened: true } : noti,
+        ),
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     };
 
     const handleUpdateMarkAllRead = () => {
@@ -89,22 +92,22 @@ const NotificationMenu = () => {
       socket?.off("notificationRead", handleRead);
       socket?.off("markedAllasRead", handleUpdateMarkAllRead);
     };
-  });
+  }, []);
 
   useEffect(() => {
-    if (data?.data) {
-      if (data.data?.notifications) {
-        for (const noti of data.data.notifications) {
-          const exist = notifications.find((nt) => noti._id === nt._id);
-          if (!exist) {
-            setNotifications((prev) => [...prev, noti]);
-          }
-        }
-      }
+    const incoming = data?.data?.notifications;
+    if (!incoming) return;
 
-      setUnreadCount(data?.data?.unreadCount);
-    }
-  }, [data?.data]);
+    setNotifications((prev) => {
+      const merged = new Map(prev.map((noti) => [noti._id, noti]));
+      for (const noti of incoming) {
+        merged.set(noti._id, noti);
+      }
+      return [...merged.values()];
+    });
+
+    setUnreadCount(data.data.unreadCount || 0);
+  }, [data]);
 
   const handleScroll = () => {
     if (!containerRef.current || isLoading || isFetching) {
@@ -124,6 +127,9 @@ const NotificationMenu = () => {
     socket?.emit("markAllRead");
   };
 
+  const isBusy = isLoading || isFetching;
+  const isEmpty = !isBusy && notifications.length === 0;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -132,60 +138,66 @@ const NotificationMenu = () => {
           className="size-8 bg-background"
           icon={<Bell size={18} />}
           count={unreadCount}
-          tooptip="Notificatons"
+          tooptip="Notifications"
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="-right-10 w-80 p-2 bg-background border border-border-color">
-        <DropdownMenuLabel>
-          <div className="pb-1 mb-2 border-b border-border-color flex justify-between">
-            <p className="font-semibold text-lg">Notifications</p>
-            <button
-              onClick={handleMarkAllRead}
-              className="text-xs text-primary cursor-pointer"
-            >
-              Mark all as read
-            </button>
+      <DropdownMenuContent className="-right-10 w-84 border border-border-color bg-background p-2">
+        <DropdownMenuLabel className="p-0">
+          <div className="mb-1.5 flex items-center justify-between border-b border-border-color px-1 pb-2">
+            <p className="text-sm font-semibold tracking-tight">
+              Notifications
+            </p>
+            {unreadCount > 0 && (
+              <button
+                onClick={handleMarkAllRead}
+                className="cursor-pointer text-[11px] font-medium text-primary"
+              >
+                Mark all as read
+              </button>
+            )}
           </div>
         </DropdownMenuLabel>
 
         <div
           onScroll={handleScroll}
-          className="w-full pb-2 custom-scrollbar space-y-2 max-h-72 overflow-y-auto"
+          className="custom-scrollbar max-h-80 w-full space-y-0.5 overflow-y-auto"
           ref={containerRef}
         >
-          {notifications?.map((noti) => (
-            <div
-              onClick={() => handleClick(noti)}
+          {notifications.map((noti) => (
+            <NotificationItem
               key={noti._id}
-              className={`${noti?.opened ? "bg-background" : "bg-secondary/10"} border border-border-color px-3 py-1 rounded-md shadow-md cursor-pointer`}
-            >
-              <p className="font-semibold text-sm line-clamp-2 pb-2">
-                {noti?.text}
-              </p>
-              <div className="flex justify-between">
-                <UserCard size="sm" user={noti.userFrom} />
-                <div className="text-xs text-gray">
-                  {dayjs(noti?.createdAt)?.fromNow()}
-                </div>
-              </div>
-            </div>
+              noti={noti}
+              currentUserId={currentUserId}
+              onSelect={handleClick}
+            />
           ))}
-          {(isFetching || isLoading) &&
+
+          {isEmpty && (
+            <div className="flex flex-col items-center gap-1.5 px-3 py-8 text-center">
+              <BellOff className="text-foreground/25" size={22} />
+              <p className="text-[13px] font-medium">No notifications yet</p>
+              <p className="text-[11px] text-foreground/50">
+                Activity from your team will show up here.
+              </p>
+            </div>
+          )}
+
+          {isBusy &&
             Array.from({ length: 4 }, (_, i) => (
-              <div
-                className="bg-background border border-border-color px-3 py-1 rounded-md shadow-md cursor-pointer space-y-1"
-                key={i}
-              >
-                <Skeleton className="h-3 w-full bg-background-foreground" />
-                <div className="flex w-full gap-1 items-center">
-                  <Skeleton className="h-8 w-9 bg-background-foreground rounded-full" />
-                  <div className="w-full">
-                    <Skeleton className="h-3 w-1/2 bg-background-foreground" />
-                    <Skeleton className="h-2 mt-1 w-1/3 bg-background-foreground" />
-                  </div>
+              <div className="flex items-start gap-2.5 px-2.5 py-2.5" key={i}>
+                <Skeleton className="size-8.5 shrink-0 rounded-[10px] bg-background-foreground" />
+                <div className="w-full space-y-1.5">
+                  <Skeleton className="h-3 w-full bg-background-foreground" />
+                  <Skeleton className="h-2.5 w-1/3 bg-background-foreground" />
                 </div>
               </div>
             ))}
+
+          {!isBusy && !isEmpty && !data?.pagination?.hasMore && (
+            <p className="py-2.5 text-center text-[11px] text-foreground/40">
+              You&apos;re all caught up
+            </p>
+          )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

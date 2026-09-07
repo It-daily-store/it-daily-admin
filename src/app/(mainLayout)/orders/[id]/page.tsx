@@ -40,27 +40,8 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "pending":
-      return "bg-yellow-100 text-yellow-800";
-    case "confirmed":
-      return "bg-blue-100 text-blue-800";
-    case "processing":
-      return "bg-orange-100 text-orange-800";
-    case "shipped":
-      return "bg-purple-100 text-purple-800";
-    case "delivered":
-      return "bg-green-100 text-green-800";
-    case "cancelled":
-      return "bg-red-100 text-red-800";
-    case "returned":
-      return "bg-gray-100 text-gray-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
-
+import OrderStatusTimeline from "@/components/orders/OrderStatusTimeline";
+import { getOrderStatusConfig } from "@/components/orders/orderStatus";
 import {
   useGetOrderByIdQuery,
   useUpdateOrderMutation,
@@ -68,8 +49,6 @@ import {
 import PageHeader from "@/components/common/PageHeader";
 import { useEffect } from "react";
 import { IOrder } from "@/interface/order.interface";
-import dayjs from "dayjs";
-import TdUser from "@/components/global/TdUser";
 
 const formSchema = z.object({
   currentStatus: z.enum([
@@ -156,22 +135,10 @@ const OrderDetailsPage = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
+      // The backend appends the status history entry, including who did it.
       const updateData: any = {
         ...values,
       };
-
-      // Add to status history only if status changed
-      if (values.currentStatus !== order.currentStatus) {
-        updateData.statusHistory = [
-          ...(order.statusHistory || []),
-          {
-            status: values.currentStatus,
-            notes:
-              values.adminNotes || `Status changed to ${values.currentStatus}`,
-            timestamp: new Date(),
-          },
-        ];
-      }
 
       await updateOrder({
         id: order._id as string,
@@ -255,7 +222,11 @@ const OrderDetailsPage = () => {
               </div>
               <div className="flex justify-between">
                 <span>Status</span>
-                <Badge className="capitalize">{order.currentStatus}</Badge>
+                <Badge
+                  className={getOrderStatusConfig(order.currentStatus).badge}
+                >
+                  {getOrderStatusConfig(order.currentStatus).label}
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -294,68 +265,8 @@ const OrderDetailsPage = () => {
             <CardHeader>
               <CardTitle>Status History</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute top-0 bottom-0 left-3 w-0.5 bg-gray-200"></div>
-
-                <div className="space-y-3">
-                  {order.statusHistory.map((status, index) => {
-                    const isCompleted = true; // All items in history are completed
-
-                    return (
-                      <div
-                        key={index}
-                        className="relative flex items-start gap-4"
-                      >
-                        {/* Timeline dot */}
-                        <div
-                          className={`relative z-10 flex size-6 items-center justify-center rounded-full border-2 ${
-                            isCompleted
-                              ? "border-primary bg-green-100"
-                              : "border-gray-300 bg-gray-100"
-                          }`}
-                        >
-                          <div
-                            className={`h-3 w-3 rounded-full ${isCompleted ? "bg-primary" : "bg-gray-300"}`}
-                          ></div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="min-w-0 flex-1 pb-6">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <Badge className={getStatusColor(status.status)}>
-                                {status.status.charAt(0).toUpperCase() +
-                                  status.status.slice(1)}
-                              </Badge>
-                            </div>
-                            <div className="text-dark-gray text-sm">
-                              {dayjs(status.timestamp).format(
-                                "MMMM D, YYYY h:mm A",
-                              )}
-                            </div>
-                          </div>
-                          {status.notes && (
-                            <p className="text-dark-gray mt-2 text-sm">
-                              {status.notes}
-                            </p>
-                          )}
-
-                          {status.updatedBy && (
-                            <div className="space-y-1 mt-2">
-                              <div className="shrink-0 text-dark-gray text-sm font-semibold">
-                                Updated By:
-                              </div>
-                              <TdUser user={status.updatedBy} />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+            <CardContent className="max-h-[320px] overflow-y-auto scrollbar-thin">
+              <OrderStatusTimeline history={order.statusHistory} />
             </CardContent>
           </Card>
         </div>
