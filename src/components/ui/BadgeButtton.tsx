@@ -31,9 +31,11 @@ const BadgeButtton = React.forwardRef<
         {text}
       </Button>
 
-      <div className="absolute -top-2 text-pure-white flex items-center justify-center right-0 bg-primary rounded-xl w-4 h-4 text-xs">
-        {count > 99 ? "99+" : count}
-      </div>
+      {count > 0 && (
+        <div className="absolute -top-2 text-pure-white flex items-center justify-center right-0 bg-primary rounded-xl w-4 h-4 text-xs">
+          {count > 99 ? "99+" : count}
+        </div>
+      )}
     </div>
   );
 });
