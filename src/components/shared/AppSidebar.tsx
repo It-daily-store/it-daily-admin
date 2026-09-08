@@ -30,8 +30,8 @@ import {
 } from "../ui/collapsible";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/redux/hooks";
-import { TPermission } from "@/interface/auth.interface";
+import { TPermissionKey } from "@/interface/auth.interface";
+import { useCan } from "@/lib/permissions";
 import { sidebarGroups, TSidebarItem } from "./sidebarMenus";
 
 // Length of the matched prefix, or -1 when the link does not cover the path.
@@ -40,18 +40,19 @@ const matchLength = (path: string, link: string) => {
   return path === link || path.startsWith(link + "/") ? link.length : -1;
 };
 
-const canRead = (item: TSidebarItem, permissions?: TPermission[]) =>
-  !item.feature ||
-  !!permissions?.find((p) => p.feature === item.feature)?.access.read;
+type TCan = (key: TPermissionKey) => boolean;
 
-function visibleItems(items: TSidebarItem[], permissions?: TPermission[]) {
+const canRead = (item: TSidebarItem, can: TCan) =>
+  !item.permission || can(item.permission);
+
+function visibleItems(items: TSidebarItem[], can: TCan) {
   return items.reduce<TSidebarItem[]>((acc, item) => {
     if (item.children?.length) {
-      const children = item.children.filter((c) => canRead(c, permissions));
+      const children = item.children.filter((c) => canRead(c, can));
       if (children.length) acc.push({ ...item, children });
       return acc;
     }
-    if (canRead(item, permissions)) acc.push(item);
+    if (canRead(item, can)) acc.push(item);
     return acc;
   }, []);
 }
@@ -134,16 +135,16 @@ export function AppSidebar() {
   const pathName = usePathname();
   const { state } = useSidebar();
   const { theme } = useTheme();
-  const { permissions } = useAppSelector((s) => s.auth);
+  const can = useCan();
 
   const groups = useMemo(() => {
     return sidebarGroups
       .map((group) => ({
         ...group,
-        items: visibleItems(group.items, permissions),
+        items: visibleItems(group.items, can),
       }))
       .filter((group) => group.items.length > 0);
-  }, [permissions]);
+  }, [can]);
 
   // Most specific leaf wins, so /products/create highlights Create Product rather than All Products.
   const activeLink = useMemo(() => {

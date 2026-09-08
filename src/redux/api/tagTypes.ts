@@ -4,6 +4,7 @@ export enum tagTypes {
   upload = "upload",
   galleryFolder = "galleryFolder",
   roles = "roles",
+  singleRole = "singleRole",
   admins = "admins",
   brands = "brands",
   product = "product",
@@ -15,6 +16,7 @@ export enum tagTypes {
   orders = "orders",
   banner = "banner",
   singleBanner = "singleBanner",
+  permissionCatalog = "permissionCatalog",
 }
 
 export const tagTypesList = [
@@ -23,6 +25,7 @@ export const tagTypesList = [
   tagTypes.upload,
   tagTypes.galleryFolder,
   tagTypes.roles,
+  tagTypes.singleRole,
   tagTypes.admins,
   tagTypes.brands,
   tagTypes.product,
@@ -34,4 +37,5 @@ export const tagTypesList = [
   tagTypes.orders,
   tagTypes.banner,
   tagTypes.singleBanner,
+  tagTypes.permissionCatalog,
 ];

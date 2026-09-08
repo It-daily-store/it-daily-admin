@@ -1,40 +1,85 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { globalError } from "@/lib/utils";
-import { TPermission, TRole } from "@/interface/auth.interface";
-import { useDeleteRoleMutation, useGetRolesQuery } from "@/redux/api/rolesApi";
-import React, { useState } from "react";
+import { TModulePermission, TRole } from "@/interface/auth.interface";
+import {
+  useDeleteRoleMutation,
+  useGetPermissionCatalogQuery,
+  useGetRolesQuery,
+} from "@/redux/api/rolesApi";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import TableSkeleton from "@/components/shared/TableSkeleton";
-import ViewRoleModal from "@/components/roles/ViewRoleModal";
 import { useAppSelector } from "@/redux/hooks";
-import EditRoleModal from "@/components/roles/EditRoleModal";
 import CreateRoleModal from "@/components/roles/CreateRoleModal";
 import DeleteModal from "@/components/global/DeleteModal";
 import { toast } from "sonner";
 import NoData from "@/components/shared/NoData";
 import PageHeader from "@/components/common/PageHeader";
+import { useCan } from "@/lib/permissions";
+import Link from "next/link";
+import GlobalTable, {
+  TCustomColumnDef,
+} from "@/components/common/GlobalTable/GlobalTable";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
+import { LayoutGrid, List } from "lucide-react";
+
+const VIEW_STORAGE_KEY = "roles_view";
+
+type TRolesView = "table" | "card";
+
+const readStoredView = (): TRolesView => {
+  try {
+    return localStorage.getItem(VIEW_STORAGE_KEY) === "card" ? "card" : "table";
+  } catch {
+    return "table";
+  }
+};
+
+const countGranted = (permissions: TModulePermission[] = []) =>
+  permissions.reduce(
+    (acc, module) =>
+      acc +
+      Object.values(module.permissions ?? {}).filter((v) => v === true).length,
+    0,
+  );
 
 const Roles = () => {
   const { data: rolesData, isLoading, error } = useGetRolesQuery(undefined);
-  const [veiwData, setViewData] = useState<TRole | null>(null);
-  const [editData, setEditData] = useState<TRole | null>(null);
-  const { permissions, user } = useAppSelector((s) => s.auth);
+  const { data: catalogRes } = useGetPermissionCatalogQuery(undefined);
+  const { user } = useAppSelector((s) => s.auth);
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteRole, { isLoading: isDeleting }] = useDeleteRoleMutation();
   const [roleToDelete, setRoleToDelete] = useState<TRole | null>(null);
+  const [view, setView] = useState<TRolesView>("table");
 
-  const rolePermission: TPermission | undefined = permissions?.find(
-    (p) => p.feature === "role",
+  const can = useCan();
+
+  // localStorage is read after mount so server and first client render agree.
+  useEffect(() => {
+    setView(readStoredView());
+  }, []);
+
+  const changeView = (next: TRolesView) => {
+    setView(next);
+    try {
+      localStorage.setItem(VIEW_STORAGE_KEY, next);
+    } catch {
+      // storage can be unavailable in private windows; the choice just won't persist
+    }
+  };
+
+  const totalPermissions: number = useMemo(
+    () =>
+      (catalogRes?.data ?? []).reduce(
+        (acc: number, group: { permissions: unknown[] }) =>
+          acc + group.permissions.length,
+        0,
+      ),
+    [catalogRes],
   );
+
+  const roles: TRole[] = rolesData?.data ?? [];
 
   if (!isLoading && error) {
     globalError(error);
@@ -50,6 +95,91 @@ const Roles = () => {
     }
   };
 
+  const grantedLabel = (role: TRole) =>
+    totalPermissions
+      ? `${countGranted(role.permissions)} of ${totalPermissions}`
+      : `${countGranted(role.permissions)}`;
+
+  const canDelete = (role: TRole) =>
+    can("can_delete_role") && user?.role?._id !== role._id;
+
+  const defaultColumns: TCustomColumnDef<TRole>[] = [
+    {
+      accessorKey: "serial",
+      header: "Serial",
+      cell: ({ row }) => <p>{row.index + 1}</p>,
+      id: "serial",
+      maxSize: 60,
+      visible: true,
+      canHide: false,
+    },
+    {
+      accessorKey: "role",
+      header: "Role Title",
+      cell: ({ row }) => (
+        <Link
+          href={`/roles/${row.original._id}`}
+          className="font-semibold capitalize text-primary hover:underline"
+        >
+          {row.original.role}
+        </Link>
+      ),
+      id: "role",
+      minSize: 160,
+      maxSize: 240,
+      visible: true,
+      canHide: false,
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      cell: ({ row }) => (
+        <p className="line-clamp-2 whitespace-normal text-gray">
+          {row.original.description || "—"}
+        </p>
+      ),
+      id: "description",
+      minSize: 240,
+      visible: true,
+      canHide: true,
+    },
+    {
+      accessorKey: "permissions",
+      header: "Permissions",
+      cell: ({ row }) => (
+        <p className="text-dark-gray">{grantedLabel(row.original)}</p>
+      ),
+      id: "permissions",
+      minSize: 120,
+      maxSize: 160,
+      visible: true,
+      canHide: true,
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <Link href={`/roles/${row.original._id}`}>
+            <Button variant={"view_button"} size={"base"}></Button>
+          </Link>
+          {canDelete(row.original) && (
+            <Button
+              onClick={() => setRoleToDelete(row.original)}
+              variant={"delete_button"}
+              size={"base"}
+            ></Button>
+          )}
+        </div>
+      ),
+      id: "actions",
+      minSize: 120,
+      maxSize: 150,
+      visible: true,
+      canHide: false,
+    },
+  ];
+
   return (
     <div className="w-full">
       <PageHeader
@@ -57,8 +187,31 @@ const Roles = () => {
         subtitle="Manage dynamic roles and permissions."
         buttons={
           <>
+            <div className="flex items-center gap-1">
+              <Button
+                variant={"bordered"}
+                size={"icon"}
+                aria-label="Table view"
+                aria-pressed={view === "table"}
+                onClick={() => changeView("table")}
+                className={cn(
+                  view === "table" && "border-primary text-primary",
+                )}
+              >
+                <List size={16} />
+              </Button>
+              <Button
+                variant={"bordered"}
+                size={"icon"}
+                aria-label="Card view"
+                aria-pressed={view === "card"}
+                onClick={() => changeView("card")}
+                className={cn(view === "card" && "border-primary text-primary")}
+              >
+                <LayoutGrid size={16} />
+              </Button>
+            </div>
             <CreateRoleModal open={createOpen} setOpen={setCreateOpen} />
-            <div></div>
           </>
         }
       />
@@ -67,63 +220,52 @@ const Roles = () => {
         <NoData text="Could not get roles" />
       )}
 
-      {isLoading ? (
-        <TableSkeleton />
-      ) : rolesData?.data ? (
-        <Table className="">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Serial</TableHead>
-              <TableHead>Role Title</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rolesData?.data?.map((role: TRole, i: number) => (
-              <TableRow key={role._id}>
-                <TableCell className="w-48 font-medium">{i + 1}</TableCell>
-                <TableCell className="w-80 font-semibold capitalize text-primary">
-                  {role.role}
-                </TableCell>
-                <TableCell>
-                  <div className="line-clamp-2 max-w-[400px] overflow-hidden text-ellipsis whitespace-normal">
-                    {role.description}
-                  </div>
-                </TableCell>
-                <TableCell className="flex h-full items-center gap-3">
-                  <Button
-                    onClick={() => setViewData(role)}
-                    variant={"view_button"}
-                    size={"base"}
-                  ></Button>
-                  {rolePermission?.access.update &&
-                    user?.role._id !== role._id && (
-                      <Button
-                        onClick={() => setEditData(role)}
-                        variant={"edit_button"}
-                        size={"base"}
-                      ></Button>
-                    )}
-                  {rolePermission?.access.delete &&
-                    user?.role._id !== role._id && (
-                      <Button
-                        onClick={() => setRoleToDelete(role)}
-                        variant={"delete_button"}
-                        size={"base"}
-                      ></Button>
-                    )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      {view === "table" ? (
+        <GlobalTable
+          tableName="roles_table"
+          defaultColumns={defaultColumns}
+          data={roles}
+          isLoading={isLoading}
+          limit={20}
+        />
+      ) : isLoading ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 w-full" />
+          ))}
+        </div>
       ) : (
-        <></>
-      )}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {roles.map((role) => (
+            <Link
+              key={role._id}
+              href={`/roles/${role._id}`}
+              className="font-semibold capitalize cursor-pointer"
+            >
+              <div className="flex flex-col gap-2 border bg-background-foreground rounded-lg hover:border-primary/50 hover:shadow-lg border-border-color p-4">
+                <div className="flex items-start justify-between gap-2">
+                  {role.role}
+                  {canDelete(role) && (
+                    <Button
+                      onClick={() => setRoleToDelete(role)}
+                      variant={"delete_button"}
+                      size={"base"}
+                    ></Button>
+                  )}
+                </div>
 
-      <ViewRoleModal viewData={veiwData} setOpen={setViewData} />
-      <EditRoleModal editData={editData} setOpen={setEditData} />
+                <p className="line-clamp-3 min-h-[3.5rem] text-sm text-gray">
+                  {role.description || "No description"}
+                </p>
+
+                <p className="text-xs text-dark-gray">
+                  {grantedLabel(role)} permissions granted
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
       <DeleteModal
         open={roleToDelete !== null}

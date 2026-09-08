@@ -1,6 +1,12 @@
-import { TRole } from "@/interface/auth.interface";
+import { EAppModules, TRole } from "@/interface/auth.interface";
 import { baseApi } from "./baseApi";
 import { tagTypes } from "./tagTypes";
+
+export type TPermissionCatalog = {
+  module: EAppModules;
+  label: string;
+  permissions: { key: string; label: string }[];
+}[];
 
 const rolesApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -12,6 +18,26 @@ const rolesApi = baseApi.injectEndpoints({
         };
       },
       providesTags: [tagTypes.roles],
+    }),
+
+    getSingleRole: build.query({
+      query: (id: string) => {
+        return {
+          url: `/roles/${id}`,
+          method: "GET",
+        };
+      },
+      providesTags: [tagTypes.singleRole],
+    }),
+
+    getPermissionCatalog: build.query({
+      query: () => {
+        return {
+          url: "/roles/permission-catalog",
+          method: "GET",
+        };
+      },
+      providesTags: [tagTypes.permissionCatalog],
     }),
 
     createRole: build.mutation({
@@ -33,7 +59,8 @@ const rolesApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: (result) => (result ? [tagTypes.roles] : []),
+      invalidatesTags: (result) =>
+        result ? [tagTypes.roles, tagTypes.singleRole] : [],
     }),
 
     deleteRole: build.mutation({
@@ -50,6 +77,8 @@ const rolesApi = baseApi.injectEndpoints({
 
 export const {
   useGetRolesQuery,
+  useGetSingleRoleQuery,
+  useGetPermissionCatalogQuery,
   useUpdateRoleMutation,
   useCreateRoleMutation,
   useDeleteRoleMutation,

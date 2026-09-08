@@ -18,13 +18,13 @@ import {
   Users,
   UsersRound,
 } from "lucide-react";
-import { EAppFeatures } from "@/interface/auth.interface";
+import { TPermissionKey } from "@/interface/auth.interface";
 
 export type TSidebarItem = {
   title: string;
   link: string;
   icon: LucideIcon;
-  feature?: EAppFeatures;
+  permission?: TPermissionKey;
   children?: TSidebarItem[];
 };
 
@@ -46,31 +46,31 @@ export const sidebarGroups: TSidebarGroup[] = [
         title: "Products",
         link: "/products",
         icon: ShoppingCart,
-        feature: EAppFeatures.product,
+        permission: "can_see_product_page",
         children: [
           {
             title: "All Products",
             link: "/products",
             icon: GalleryVertical,
-            feature: EAppFeatures.product,
+            permission: "can_see_product_page",
           },
           {
             title: "Create Product",
             link: "/products/create",
             icon: DiamondPlusIcon,
-            feature: EAppFeatures.product,
+            permission: "can_create_product",
           },
           {
             title: "Bulk Upload",
             link: "/products/bulk-upload",
             icon: HardDriveUpload,
-            feature: EAppFeatures.bulkUpload,
+            permission: "can_see_bulk_upload_page",
           },
           {
             title: "Filters",
             link: "/products/filters",
             icon: SlidersHorizontal,
-            feature: EAppFeatures.productFilter,
+            permission: "can_see_filter_page",
           },
         ],
       },
@@ -78,19 +78,19 @@ export const sidebarGroups: TSidebarGroup[] = [
         title: "Categories",
         link: "/categories",
         icon: ListTodo,
-        feature: EAppFeatures.category,
+        permission: "can_see_category_page",
       },
       {
         title: "Detail Categories",
         link: "/detail-categories",
         icon: LayoutDashboard,
-        feature: EAppFeatures.productDetails,
+        permission: "can_see_details_category_page",
       },
       {
         title: "Brands",
         link: "/brands",
         icon: Tags,
-        feature: EAppFeatures.brand,
+        permission: "can_see_brand_page",
       },
     ],
   },
@@ -101,13 +101,13 @@ export const sidebarGroups: TSidebarGroup[] = [
         title: "Orders",
         link: "/orders",
         icon: ShoppingBasket,
-        feature: EAppFeatures.orders,
+        permission: "can_see_order_page",
       },
       {
         title: "Deals",
         link: "/deals",
         icon: Package,
-        feature: EAppFeatures.deals,
+        permission: "can_see_deal_page",
       },
     ],
   },
@@ -118,19 +118,19 @@ export const sidebarGroups: TSidebarGroup[] = [
         title: "Users",
         link: "/users",
         icon: Users,
-        feature: EAppFeatures.user,
+        permission: "can_see_admin_page",
         children: [
           {
             title: "Admins",
             link: "/users/admins",
             icon: UserPen,
-            feature: EAppFeatures.user,
+            permission: "can_see_admin_page",
           },
           {
             title: "Customers",
             link: "/users/customers",
             icon: UsersRound,
-            feature: EAppFeatures.user,
+            permission: "can_see_customer_page",
           },
         ],
       },
@@ -138,7 +138,7 @@ export const sidebarGroups: TSidebarGroup[] = [
         title: "Roles",
         link: "/roles",
         icon: UserCog,
-        feature: EAppFeatures.role,
+        permission: "can_see_role_page",
       },
     ],
   },
@@ -149,13 +149,13 @@ export const sidebarGroups: TSidebarGroup[] = [
         title: "Banner Builder",
         link: "/storefront/banner-builder",
         icon: GalleryHorizontalEnd,
-        feature: EAppFeatures.banner,
+        permission: "can_see_banner_page",
       },
       {
         title: "PC Builder",
         link: "/storefront/pc-builder",
         icon: Computer,
-        feature: EAppFeatures.settings,
+        permission: "can_see_pc_builder_page",
       },
     ],
   },

@@ -16,8 +16,7 @@ import {
   useUpdateTemplateMutation,
 } from "@/redux/api/bannerApi";
 import { useUploadImageMutation } from "@/redux/api/uploadFiles";
-import { useAppSelector } from "@/redux/hooks";
-import { EAppFeatures } from "@/interface/auth.interface";
+import { useCan } from "@/lib/permissions";
 import { globalError } from "@/lib/utils";
 import { toast } from "sonner";
 import PageHeader from "@/components/common/PageHeader";
@@ -26,10 +25,7 @@ export default function BannerEditPage() {
   const { templateId } = useParams<{ templateId: string }>();
   const router = useRouter();
   const { theme } = useTheme();
-  const { permissions } = useAppSelector((state) => state.auth);
-  const bannerPermission = permissions?.find(
-    (p) => p.feature === EAppFeatures.banner,
-  );
+  const can = useCan();
 
   const { data, isLoading, error } = useGetTemplateQuery(templateId);
   const [updateTemplate] = useUpdateTemplateMutation();
@@ -103,7 +99,7 @@ export default function BannerEditPage() {
         }
       />
 
-      {bannerPermission?.access.update ? (
+      {can("can_update_banner") ? (
         <div style={{ height: "calc(100vh - 220px)" }}>
           <BannerBuilder
             template={template}

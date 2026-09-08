@@ -1,15 +1,15 @@
-import { TPermission, TUser } from "@/interface/auth.interface";
+import { TModulePermission, TUser } from "@/interface/auth.interface";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type TSetUserData = {
   user: TUser;
-  permissions: TPermission[];
+  permissions: TModulePermission[];
 };
 
 type TInitialState = {
   isAuthenticated: boolean;
   user: TUser | null;
-  permissions: TPermission[];
+  permissions: TModulePermission[];
   isVerified: boolean;
   token: string | null;
   resetSentTime?: string | null;
