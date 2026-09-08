@@ -20,6 +20,16 @@ const rolesApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.roles],
     }),
 
+    getSingleRole: build.query({
+      query: (id: string) => {
+        return {
+          url: `/roles/${id}`,
+          method: "GET",
+        };
+      },
+      providesTags: [tagTypes.singleRole],
+    }),
+
     getPermissionCatalog: build.query({
       query: () => {
         return {
@@ -49,7 +59,8 @@ const rolesApi = baseApi.injectEndpoints({
           data: payload,
         };
       },
-      invalidatesTags: (result) => (result ? [tagTypes.roles] : []),
+      invalidatesTags: (result) =>
+        result ? [tagTypes.roles, tagTypes.singleRole] : [],
     }),
 
     deleteRole: build.mutation({
@@ -66,6 +77,7 @@ const rolesApi = baseApi.injectEndpoints({
 
 export const {
   useGetRolesQuery,
+  useGetSingleRoleQuery,
   useGetPermissionCatalogQuery,
   useUpdateRoleMutation,
   useCreateRoleMutation,
