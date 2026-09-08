@@ -10,6 +10,7 @@ import NotificationMenu from "../notifications/NotificationMenu";
 import { Images, LogOut, Moon, Sun } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
 import GlobalDropdown from "../common/GlobalDropdown";
+import PageBreadcrumb from "./PageBreadcrumb";
 import { handleLogout } from "@/lib/utils";
 
 const Navbar = () => {
@@ -34,8 +35,11 @@ const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50">
       <div className="py-2 flex gap-2 justify-between items-center border-border-color bg-sidebar border-b">
-        <SidebarTrigger className="md:hidden" />
-        <div className="flex w-full justify-end items-center gap-2">
+        <div className="flex items-center gap-2 px-2 min-w-0">
+          <SidebarTrigger className="md:hidden" />
+          <PageBreadcrumb />
+        </div>
+        <div className="flex justify-end items-center gap-2">
           <Button
             variant={"secondary"}
             onClick={() => setGalleryOpen(true)}
