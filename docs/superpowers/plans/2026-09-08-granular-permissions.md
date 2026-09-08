@@ -117,7 +117,7 @@ export const MODULE_LABELS: Record<EAppModules, string> = {
   [EAppModules.settings]: "Settings",
 };
 
-export const PERMISSION_CATALOG: Record<EAppModules, TPermissionDef[]> = {
+export const PERMISSION_CATALOG = {
   [EAppModules.product]: [
     { key: "can_see_product_page", label: "See product page", legacy: "read" },
     {
@@ -352,7 +352,7 @@ export const PERMISSION_CATALOG: Record<EAppModules, TPermissionDef[]> = {
     { key: "can_read_settings", label: "View settings", legacy: "read" },
     { key: "can_update_settings", label: "Update settings", legacy: "update" },
   ],
-};
+} as const satisfies Record<EAppModules, readonly TPermissionDef[]>;
 
 export const ALL_PERMISSION_KEYS = new Set<string>();
 
@@ -369,7 +369,11 @@ for (const defs of Object.values(PERMISSION_CATALOG)) {
   }
 }
 
-export type TPermissionKey = string;
+// `as const` preserves the literal key strings so this resolves to a union of
+// all 70 keys rather than `string`. That is what makes a typo at any of the 58
+// route call sites a compile error instead of a route nobody can ever reach.
+export type TPermissionKey =
+  (typeof PERMISSION_CATALOG)[EAppModules][number]["key"];
 ```
 
 - [ ] **Step 3: Verify the enum rename has broken exactly the files you expect**
@@ -387,6 +391,17 @@ npx ts-node --transpile-only -e "const c=require('./src/app/modules/roles/roles.
 ```
 
 Expected: `keys: 70` and `modules: 14`. If it throws `Duplicate permission key`, you mistyped a key — find and fix the duplicate.
+
+Then confirm `TPermissionKey` resolved to a literal union rather than widening to `string`. Create a scratch file `src/tmp-key-check.ts`:
+
+```ts
+import { TPermissionKey } from "./app/modules/roles/roles.permissions";
+
+const good: TPermissionKey = "can_update_product";
+const bad: TPermissionKey = "can_update_prodcut";
+```
+
+Run `npx tsc --noEmit` and confirm the output contains an error on the `bad` line (`Type '"can_update_prodcut"' is not assignable to type ...`) and none on `good`. If `bad` produces no error, the `as const` is missing or misplaced and the union silently widened to `string` — fix it before continuing. Delete `src/tmp-key-check.ts` afterwards.
 
 - [ ] **Step 5: Commit**
 
@@ -1042,6 +1057,16 @@ type TLegacyEntry = { feature?: string; access?: TLegacyAccess };
 
 const APPLY = process.argv.includes("--apply");
 
+// Roles created through an older admin build persisted this misspelling of
+// `productFilter`. Left unmapped, those roles silently lose all product-filter
+// access on migration, because no catalog module matches the stored value.
+const LEGACY_FEATURE_ALIASES: Record<string, string> = {
+  porductFilter: "productFilter",
+};
+
+const normaliseFeature = (feature?: string) =>
+  feature ? (LEGACY_FEATURE_ALIASES[feature] ?? feature) : feature;
+
 const migrate = async () => {
   if (!config.database_url) {
     throw new Error("DATABASE_URL is not set");
@@ -1066,7 +1091,9 @@ const migrate = async () => {
     }
 
     const next = Object.values(EAppModules).map((module) => {
-      const legacy = entries.find((e) => e.feature === module);
+      const legacy = entries.find(
+        (e) => normaliseFeature(e.feature) === module,
+      );
       const permissions = Object.fromEntries(
         PERMISSION_CATALOG[module].map((def) => [
           def.key,
@@ -1113,6 +1140,8 @@ migrate().catch((err) => {
 
 The script defaults to a dry run. It is idempotent: a document whose entries no longer carry `feature` is skipped.
 
+`LEGACY_FEATURE_ALIASES` supersedes the untracked `scripts/fix-porduct-filter-permission-typo.js` in the backend repo root — that script rewrote `porductFilter` to `productFilter` in place, and folding the same mapping in here removes the ordering hazard of having to run it first. **Delete that file as part of this task**; it is untracked, so `rm scripts/fix-porduct-filter-permission-typo.js` is the whole job. Do not run it.
+
 - [ ] **Step 2: Add the npm script to `package.json`**
 
 ```json
@@ -1127,6 +1156,14 @@ npm run migrate:permissions
 ```
 
 Expected: one `MIGRATE` line per legacy role showing a legacy-flag count and a granted-key count, then `DRY RUN — nothing written`. A role with `read+update` on one module should show a granted count noticeably higher than its legacy count, because one `read` fans out to several keys.
+
+Then confirm the alias works. Run:
+
+```bash
+mongosh "<DATABASE_URL>" --quiet --eval 'db.roles.countDocuments({"permissions.feature":"porductFilter"})'
+```
+
+If this returns more than 0, at least one role carries the misspelling. Re-run the dry run and confirm those roles' granted counts include their product-filter keys — a role holding `porductFilter` with `read: true` must show its `can_read_all_filters` granted, not dropped. If the count is 0, nothing to check.
 
 - [ ] **Step 4: Apply, then confirm idempotency**
 
