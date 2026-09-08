@@ -22,6 +22,8 @@ plural in others (`brand`, `category`, `product` against `orders`, `users`,
 `/product/all-products`). Dynamic parameters are named five different ways
 (`[updateId]`, `[dealId]`, `[userId]`, `[id]`, `[templateId]`). Three grouping
 segments (`offers`, `shop`, `settings`) exist solely to hold one child each.
+`settings` holds PC Builder, which is a storefront feature rather than an
+application setting and is filed under the wrong parent.
 The dashboard lives at `src/app/page.tsx`, outside the `(mainLayout)` route
 group, and wraps `<MainLayout>` by hand — duplicating what
 `src/app/(mainLayout)/layout.tsx` already does and creating a second auth-gate
@@ -48,36 +50,42 @@ during implementation.
 
 1. **Both sidebar and URLs change.** Not sidebar-only, not routes-only.
 2. **No redirect layer.** Old bookmarks break. Accepted.
-3. **Sidebar segments are display-only.** Group labels do not become URL
-   segments. URLs stay one level per resource: `/brands`, not
-   `/catalog/brands`.
+3. **Sidebar group labels are display-only; URL segments express namespaces.**
+   A taxonomy label never becomes a path segment — `/brands`, not
+   `/catalog/brands`. A path segment exists only where it is a genuine
+   namespace shared by two or more sibling pages, which is why `/users/admins`,
+   `/products/filters` and `/shop/pc-builder` keep their parent segment while
+   `/brands` and `/orders` sit at the root. A namespace segment need not be a
+   reachable page or a clickable menu item.
 4. **Collapsible submenus survive where a parent has 2+ children.** That is
    Products and Users only. Their parent triggers toggle rather than
    navigate — matching current behaviour — so neither needs a landing page.
 5. **The sidebar filters by `read` permission.**
-6. **PC Builder is grouped under STOREFRONT**, not a separate SYSTEM group.
+6. **PC Builder moves from `settings` to `shop`**, joining Banner Builder under
+   a SHOP group. It configures a storefront surface, not the application. This
+   also promotes `shop` from a one-child container into a two-child namespace,
+   which is what earns it a URL segment under rule 3. Banner Builder's path is
+   consequently unchanged. There is no separate SYSTEM group.
 
 ## Route Map
 
-| Current path                                                                                    | New path                                    |
-| ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `app/page.tsx`                                                                                  | `app/(mainLayout)/page.tsx`                 |
-| `(mainLayout)/brand/`                                                                           | `(mainLayout)/brands/`                      |
-| `(mainLayout)/category/`                                                                        | `(mainLayout)/categories/`                  |
-| `(mainLayout)/details-category/`                                                                | `(mainLayout)/detail-categories/`           |
-| `(mainLayout)/product/all-products/`                                                            | `(mainLayout)/products/`                    |
-| `(mainLayout)/product/create-product/`                                                          | `(mainLayout)/products/create/`             |
-| `(mainLayout)/product/update-product/[updateId]/`                                               | `(mainLayout)/products/[productId]/edit/`   |
-| `(mainLayout)/product/bulk-upload/`                                                             | `(mainLayout)/products/bulk-upload/`        |
-| `(mainLayout)/product/bulk-upload/result/`                                                      | `(mainLayout)/products/bulk-upload/result/` |
-| `(mainLayout)/product/filters/`                                                                 | `(mainLayout)/products/filters/`            |
-| `(mainLayout)/orders/[id]/`                                                                     | `(mainLayout)/orders/[orderNumber]/`        |
-| `(mainLayout)/offers/deals/`                                                                    | `(mainLayout)/deals/`                       |
-| `(mainLayout)/offers/deals/[dealId]/`                                                           | `(mainLayout)/deals/[dealId]/`              |
-| `(mainLayout)/shop/banner-builder/`                                                             | `(mainLayout)/banner-builder/`              |
-| `(mainLayout)/shop/banner-builder/[templateId]/`                                                | `(mainLayout)/banner-builder/[templateId]/` |
-| `(mainLayout)/settings/pc-builder/`                                                             | `(mainLayout)/pc-builder/`                  |
-| `(mainLayout)/orders/`, `users/admins/`, `users/admins/[userId]/`, `users/customers/`, `roles/` | unchanged                                   |
+| Current path                                                                                                                                                 | New path                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| `app/page.tsx`                                                                                                                                               | `app/(mainLayout)/page.tsx`                 |
+| `(mainLayout)/brand/`                                                                                                                                        | `(mainLayout)/brands/`                      |
+| `(mainLayout)/category/`                                                                                                                                     | `(mainLayout)/categories/`                  |
+| `(mainLayout)/details-category/`                                                                                                                             | `(mainLayout)/detail-categories/`           |
+| `(mainLayout)/product/all-products/`                                                                                                                         | `(mainLayout)/products/`                    |
+| `(mainLayout)/product/create-product/`                                                                                                                       | `(mainLayout)/products/create/`             |
+| `(mainLayout)/product/update-product/[updateId]/`                                                                                                            | `(mainLayout)/products/[productId]/edit/`   |
+| `(mainLayout)/product/bulk-upload/`                                                                                                                          | `(mainLayout)/products/bulk-upload/`        |
+| `(mainLayout)/product/bulk-upload/result/`                                                                                                                   | `(mainLayout)/products/bulk-upload/result/` |
+| `(mainLayout)/product/filters/`                                                                                                                              | `(mainLayout)/products/filters/`            |
+| `(mainLayout)/orders/[id]/`                                                                                                                                  | `(mainLayout)/orders/[orderNumber]/`        |
+| `(mainLayout)/offers/deals/`                                                                                                                                 | `(mainLayout)/deals/`                       |
+| `(mainLayout)/offers/deals/[dealId]/`                                                                                                                        | `(mainLayout)/deals/[dealId]/`              |
+| `(mainLayout)/settings/pc-builder/`                                                                                                                          | `(mainLayout)/shop/pc-builder/`             |
+| `(mainLayout)/orders/`, `users/admins/`, `users/admins/[userId]/`, `users/customers/`, `roles/`, `shop/banner-builder/`, `shop/banner-builder/[templateId]/` | unchanged                                   |
 
 Naming rules, applied uniformly: resource segments are plural; a path never
 repeats its resource name or embeds a verb outside a leaf action segment
@@ -115,10 +123,16 @@ PEOPLE
     Admins                      /users/admins
     Customers                   /users/customers
   Roles                         /roles
-STOREFRONT
-  Banner Builder                /banner-builder
-  PC Builder                    /pc-builder
+SHOP
+  Banner Builder                /shop/banner-builder
+  PC Builder                    /shop/pc-builder
 ```
+
+SHOP's two entries stay flat. `shop` is a URL namespace, not a menu item, so it
+gets no collapsible — the group label already supplies the visual grouping, and
+wrapping two items in a collapsible inside a labelled group would add a level of
+nesting that buys nothing. Collapsibles appear only for Products and Users,
+which are real menu items with children.
 
 ### Configuration shape
 
@@ -201,6 +215,11 @@ render.
 | Banner Builder                         | `banner`         |
 | PC Builder                             | `settings`       |
 
+PC Builder's feature stays `settings` even though its URL moves to `/shop/`.
+The permission key is defined by the backend enum and is unrelated to the
+frontend path; renaming it would require a backend change and a data migration
+for no benefit.
+
 ### The enum must be corrected first
 
 `EAppFeatures` in `src/interface/auth.interface.ts:8-19` diverges from the
@@ -240,13 +259,15 @@ Call sites to update:
 - `product/all-products/page.tsx:229,274`
 - `product/bulk-upload/result/page.tsx:43,169,175`
 - `product/update-product/[updateId]/page.tsx:84,108`
-- `shop/banner-builder/[templateId]/page.tsx:98`
-- `shop/banner-builder/page.tsx:157`
-- `components/banner/CreateBannerTemplate.tsx:32`
 - `components/product/all-product/AllProductsGridView.tsx:109`
 - `components/notifications/notificationConfig.ts` — all nine `route`
   functions
 - `components/shared/AppSidebar.tsx` — via the extracted menu config
+
+The banner-builder call sites (`shop/banner-builder/[templateId]/page.tsx:98`,
+`shop/banner-builder/page.tsx:157`, `components/banner/CreateBannerTemplate.tsx:32`)
+need no edit — that route is unchanged. Their files move only if the route does,
+which it does not.
 
 Pages consuming a renamed dynamic parameter must update their `useParams`
 destructuring: `orders/[id]/page.tsx:83` (`id` to `orderNumber`) and
@@ -279,9 +300,10 @@ static sweep and manual walkthrough:
 1. `npm run build` passes.
 2. `npm run lint` passes.
 3. A grep sweep returns zero hits for every retired path string
-   (`/product/`, `/offers/`, `/shop/`, `/settings/pc-builder`, `/details-category`,
-   `"/brand"`, `"/category"`, `/admin/orders`, `/deal/update-deal`) across
-   `src/**/*.{ts,tsx}`, excluding `src/redux/api/`.
+   (`/product/`, `/offers/`, `/settings/`, `/details-category`, `"/brand"`,
+   `"/category"`, `/admin/orders`, `/deal/update-deal`, `/my-profile`) across
+   `src/**/*.{ts,tsx}`, excluding `src/redux/api/`. Note that `/shop/` is **not**
+   on this list: it survives as a namespace and both its children are reachable.
 4. Every route in the new map loads without a 404.
 5. Every sidebar entry navigates to its intended page and highlights correctly,
    including a child route highlighting its collapsible parent.
