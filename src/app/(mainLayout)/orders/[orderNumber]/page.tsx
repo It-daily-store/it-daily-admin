@@ -80,10 +80,12 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const OrderDetailsPage = () => {
-  const { id } = useParams();
+  const { orderNumber } = useParams();
   const router = useRouter();
 
-  const { data, isLoading, error } = useGetOrderByIdQuery(id as string);
+  const { data, isLoading, error } = useGetOrderByIdQuery(
+    orderNumber as string,
+  );
   const [updateOrder, { isLoading: isUpdating }] = useUpdateOrderMutation();
 
   const order: IOrder = data?.data;
@@ -627,7 +629,7 @@ const OrderDetailsPage = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => router.push("/admin/orders")}
+                  onClick={() => router.push("/orders")}
                 >
                   Cancel
                 </Button>

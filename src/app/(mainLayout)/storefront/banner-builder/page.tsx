@@ -154,7 +154,7 @@ const BannerBuilderPage = () => {
         <div className="flex items-center gap-3">
           <Button
             onClick={() =>
-              router.push(`/shop/banner-builder/${row.original._id}`)
+              router.push(`/storefront/banner-builder/${row.original._id}`)
             }
             variant={"edit_button"}
             size={"base"}

@@ -68,26 +68,26 @@ const UpdateProduct = () => {
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const router = useRouter();
   const params = useParams();
-  const updateId = params.updateId;
+  const productId = params.productId;
   const [product, setProduct] = useState<TProduct>(initialProduct);
   const [step, setStep] = useState(1);
 
   const { data: updateProductData } = useGetSingleProductQuery(
-    updateId as string,
-    { skip: !updateId },
+    productId as string,
+    { skip: !productId },
   );
 
   const productData: TProduct | undefined = updateProductData?.data;
 
   useEffect(() => {
-    if (!updateId) {
-      router.push("/product/create-product");
+    if (!productId) {
+      router.push("/products/create");
     }
 
     if (productData) {
       setProduct(productData);
     }
-  }, [dispatch, productData, updateId]);
+  }, [dispatch, productData, productId]);
 
   console.log({ product });
 
@@ -98,14 +98,14 @@ const UpdateProduct = () => {
 
     try {
       const res = await updateProduct({
-        id: updateId as string,
+        id: productId as string,
         payload: product,
       }).unwrap();
 
       if (res) {
         toast.success(res.message);
         setProduct(initialProduct);
-        router.push("/product/all-products");
+        router.push("/products");
       }
     } catch (err) {
       globalError(err);
@@ -221,7 +221,7 @@ const UpdateProduct = () => {
     <>
       <div>
         <PageHeader
-          title={updateId === null ? "Create Product" : "Update Product"}
+          title={productId === null ? "Create Product" : "Update Product"}
           subtitle="Add New Products to Your Inventory"
         />
 

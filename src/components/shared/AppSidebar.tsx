@@ -1,22 +1,7 @@
 "use client";
 
-import React, {
-  ForwardRefExoticComponent,
-  RefAttributes,
-  useEffect,
-  useState,
-} from "react";
-import {
-  ChevronRight,
-  Computer,
-  GalleryHorizontalEnd,
-  LayoutDashboard,
-  LucideProps,
-  Package,
-  Settings,
-  ShoppingBasket,
-  Store,
-} from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 import {
   Sidebar,
@@ -24,6 +9,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -38,281 +24,145 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import {
-  DiamondPlusIcon,
-  GalleryVertical,
-  HardDriveUpload,
-  LayoutGrid,
-  ListTodo,
-  ShoppingCart,
-  SlidersHorizontal,
-  Tags,
-  UserCog,
-  UserPen,
-  Users,
-  UsersRound,
-} from "lucide-react";
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useAppSelector } from "@/redux/hooks";
+import { TPermission } from "@/interface/auth.interface";
+import { sidebarGroups, TSidebarItem } from "./sidebarMenus";
 
-interface TMenu {
-  id: number;
-  title: string;
-  link: string;
-  icon: ForwardRefExoticComponent<
-    Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
-  >;
-  children?: TMenu[];
+// Length of the matched prefix, or -1 when the link does not cover the path.
+const matchLength = (path: string, link: string) => {
+  if (link === "/") return path === "/" ? 1 : -1;
+  return path === link || path.startsWith(link + "/") ? link.length : -1;
+};
+
+const canRead = (item: TSidebarItem, permissions?: TPermission[]) =>
+  !item.feature ||
+  !!permissions?.find((p) => p.feature === item.feature)?.access.read;
+
+function visibleItems(items: TSidebarItem[], permissions?: TPermission[]) {
+  return items.reduce<TSidebarItem[]>((acc, item) => {
+    if (item.children?.length) {
+      const children = item.children.filter((c) => canRead(c, permissions));
+      if (children.length) acc.push({ ...item, children });
+      return acc;
+    }
+    if (canRead(item, permissions)) acc.push(item);
+    return acc;
+  }, []);
 }
 
-const menus: TMenu[] = [
-  {
-    id: 1,
-    title: "Dashboard",
-    link: "/",
-    icon: LayoutGrid,
-  },
-  {
-    id: 2,
-    title: "Details Category",
-    link: "/details-category",
-    icon: LayoutDashboard,
-  },
-  {
-    id: 3,
-    title: "Brand",
-    link: "/brand",
-    icon: Tags,
-  },
-  {
-    id: 4,
-    title: "Category",
-    icon: ListTodo,
-    link: "/category",
-  },
+function CollapsibleMenu({
+  menu,
+  activeLink,
+}: {
+  menu: TSidebarItem;
+  activeLink: string | null;
+}) {
+  const parentActive = !!menu.children?.some((c) => c.link === activeLink);
+  const [open, setOpen] = useState(parentActive);
 
-  {
-    id: 5,
-    title: "Product",
-    icon: ShoppingCart,
-    link: "/product",
-    children: [
-      {
-        id: 1,
-        title: "Create Product",
-        link: "/product/create-product",
-        icon: DiamondPlusIcon,
-      },
-      {
-        id: 4,
-        title: "Product Filters",
-        link: "/product/filters",
-        icon: SlidersHorizontal,
-      },
-      {
-        id: 2,
-        title: "All Products",
-        link: "/product/all-products",
-        icon: GalleryVertical,
-      },
-      {
-        id: 3,
-        title: "Bulk Upload",
-        link: "/product/bulk-upload",
-        icon: HardDriveUpload,
-      },
-    ],
-  },
-  {
-    id: 22,
-    title: "Orders",
-    link: "/orders",
-    icon: ShoppingBasket,
-  },
-  {
-    id: 8,
-    title: "Offers",
-    link: "/offers",
-    icon: Package,
-    children: [
-      {
-        id: 1,
-        title: "Deals",
-        link: "/offers/deals",
-        icon: UserPen,
-      },
-    ],
-  },
-  {
-    id: 6,
-    title: "Roles",
-    link: "/roles",
-    icon: UserCog,
-  },
-  {
-    id: 7,
-    title: "Users",
-    link: "/users",
-    icon: Users,
-    children: [
-      {
-        id: 1,
-        title: "Admins",
-        link: "/users/admins",
-        icon: UserPen,
-      },
-      {
-        id: 2,
-        title: "Customers",
-        link: "/users/customers",
-        icon: UsersRound,
-      },
-    ],
-  },
-  {
-    id: 9,
-    title: "Settings",
-    link: "/settings",
-    icon: Settings,
-    children: [
-      {
-        id: 1,
-        title: "PC Builder",
-        link: "/settings/pc-builder",
-        icon: Computer,
-      },
-    ],
-  },
-  {
-    id: 11,
-    title: "Shop",
-    icon: Store,
-    link: "/shop",
-    children: [
-      {
-        id: 1,
-        title: "Banner Builder",
-        link: "/shop/banner-builder",
-        icon: GalleryHorizontalEnd,
-      },
-    ],
-  },
-];
+  // Deep-linking into a child (e.g. from a notification) expands its parent.
+  useEffect(() => {
+    if (parentActive) setOpen(true);
+  }, [parentActive]);
+
+  return (
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className={cn(
+        "group/collapsible",
+        parentActive && "bg-secondary/10 rounded-md",
+      )}
+    >
+      <CollapsibleTrigger asChild>
+        <SidebarMenuButton
+          tooltip={menu.title}
+          className="group/collapsible-trigger"
+        >
+          <menu.icon
+            className="text-black group-hover/collapsible-trigger:text-sidebar-accent-foreground"
+            size={18}
+          />
+          <span className="text-black group-hover/collapsible-trigger:text-sidebar-accent-foreground">
+            {menu.title}
+          </span>
+          <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+        </SidebarMenuButton>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <SidebarMenuSub>
+          {menu.children?.map((item) => {
+            const active = item.link === activeLink;
+            return (
+              <SidebarMenuSubItem
+                key={item.link}
+                className="group/sub-menu-item"
+              >
+                <SidebarMenuSubButton
+                  asChild
+                  isActive={active}
+                  className={
+                    active
+                      ? "hover:bg-transparent hover:text-pure-white"
+                      : "text-dark-gray"
+                  }
+                >
+                  <Link href={item.link} className="flex items-center gap-2">
+                    <item.icon
+                      className="text-dark group-hover/sub-menu-item:text-pure-white"
+                      size={18}
+                    />
+                    {item.title}
+                  </Link>
+                </SidebarMenuSubButton>
+              </SidebarMenuSubItem>
+            );
+          })}
+        </SidebarMenuSub>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
 export function AppSidebar() {
   const pathName = usePathname();
-  const [, setOpenRoute] = useState<number[]>([]);
   const { state } = useSidebar();
-
-  useEffect(() => {
-    menus.forEach((menu) => {
-      if (pathName.includes(menu.link)) {
-        setOpenRoute([menu.id]);
-      }
-    });
-  }, [pathName]);
-
-  const isLinkActive = (link: string) => {
-    if (link === "/" && pathName === "/") {
-      return true;
-    }
-    return pathName.substring(1) === link.substring(1);
-  };
-
-  function renderSubMenu(menu: TMenu) {
-    const active = isLinkActive(menu.link);
-    return (
-      <SidebarMenuSubItem key={menu.id} className="group/sub-menu-item">
-        <SidebarMenuSubButton
-          asChild
-          isActive={active}
-          className={
-            active
-              ? "hover:bg-transparent hover:text-pure-white"
-              : "text-dark-gray"
-          }
-        >
-          <Link href={menu.link} className="flex items-center gap-2">
-            <menu.icon
-              className="text-dark group-hover/sub-menu-item:text-pure-white"
-              size={18}
-            />
-            {menu.title}
-          </Link>
-        </SidebarMenuSubButton>
-      </SidebarMenuSubItem>
-    );
-  }
-
-  function renderMenu(menu: TMenu) {
-    const active = isLinkActive(menu.link);
-    const parentActive = pathName.includes(menu.link);
-    return (
-      <SidebarMenuItem
-        key={menu.id}
-        className={`${active ? "bg-sidebar-primary text-sidebar-accent-foreground hover:text-sidebar-accent-foreground" : ""}`}
-      >
-        {menu.children && menu?.children.length > 0 ? (
-          <Collapsible
-            className={cn(
-              "group/collapsible",
-              parentActive && "bg-secondary/10 rounded-md",
-            )}
-            defaultOpen={parentActive}
-          >
-            <CollapsibleTrigger asChild>
-              <SidebarMenuButton
-                tooltip={menu.title}
-                className="group/collapsible-trigger"
-              >
-                <menu.icon
-                  className=" text-black group-hover/collapsible-trigger:text-sidebar-accent-foreground"
-                  size={18}
-                />
-                <span className="text-black group-hover/collapsible-trigger:text-sidebar-accent-foreground">
-                  {menu.title}
-                </span>
-                <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-              </SidebarMenuButton>
-            </CollapsibleTrigger>
-            <CollapsibleContent
-              className={active ? "hover:bg-transparent" : ""}
-            >
-              <SidebarMenuSub>
-                {menu.children.map((item) => renderSubMenu(item))}
-              </SidebarMenuSub>
-            </CollapsibleContent>
-          </Collapsible>
-        ) : (
-          <SidebarMenuButton
-            className={cn(
-              active ? "hover:bg-transparent hover:text-pure-white" : "",
-              "group/menu-item",
-            )}
-            tooltip={menu.title}
-            asChild
-          >
-            <Link href={menu.link} className="flex items-center gap-2">
-              <menu.icon
-                className={cn(
-                  " text-black group-hover/menu-item:text-pure-white",
-                  isLinkActive(menu.link) && "text-sidebar-accent-foreground",
-                )}
-                size={18}
-              />
-              {menu.title}
-            </Link>
-          </SidebarMenuButton>
-        )}
-      </SidebarMenuItem>
-    );
-  }
-
   const { theme } = useTheme();
+  const { permissions } = useAppSelector((s) => s.auth);
+
+  const groups = useMemo(() => {
+    return sidebarGroups
+      .map((group) => ({
+        ...group,
+        items: visibleItems(group.items, permissions),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [permissions]);
+
+  // Most specific leaf wins, so /products/create highlights Create Product rather than All Products.
+  const activeLink = useMemo(() => {
+    let best: string | null = null;
+    let bestLength = 0;
+    groups.forEach((group) =>
+      group.items.forEach((item) => {
+        const leaves = item.children?.length ? item.children : [item];
+        leaves.forEach((leaf) => {
+          const length = matchLength(pathName, leaf.link);
+          if (length > bestLength) {
+            bestLength = length;
+            best = leaf.link;
+          }
+        });
+      }),
+    );
+    return best;
+  }, [pathName, groups]);
 
   return (
     <Sidebar collapsible="icon">
@@ -323,9 +173,6 @@ export function AppSidebar() {
               size="lg"
               className="hover:bg-transparent active:bg-transparent"
             >
-              {/* <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-                                <GalleryVerticalEnd className='size-4' />
-                            </div> */}
               <Link
                 href={"/"}
                 className="flex shrink-0 flex-col gap-0.5 leading-none"
@@ -349,11 +196,57 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>{menus.map((menu) => renderMenu(menu))}</SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {groups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((menu) => {
+                  const active = menu.link === activeLink;
+                  return (
+                    <SidebarMenuItem
+                      key={menu.link}
+                      className={
+                        active && !menu.children?.length
+                          ? "bg-sidebar-primary text-sidebar-accent-foreground hover:text-sidebar-accent-foreground"
+                          : ""
+                      }
+                    >
+                      {menu.children?.length ? (
+                        <CollapsibleMenu menu={menu} activeLink={activeLink} />
+                      ) : (
+                        <SidebarMenuButton
+                          className={cn(
+                            active
+                              ? "hover:bg-transparent hover:text-pure-white"
+                              : "",
+                            "group/menu-item",
+                          )}
+                          tooltip={menu.title}
+                          asChild
+                        >
+                          <Link
+                            href={menu.link}
+                            className="flex items-center gap-2"
+                          >
+                            <menu.icon
+                              className={cn(
+                                "text-black group-hover/menu-item:text-pure-white",
+                                active && "text-sidebar-accent-foreground",
+                              )}
+                              size={18}
+                            />
+                            {menu.title}
+                          </Link>
+                        </SidebarMenuButton>
+                      )}
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarFooter />
       <SidebarRail />

@@ -5,6 +5,7 @@ export interface TCrud {
   delete: boolean;
 }
 
+// Must mirror EAppFeatures in it-daily-backend roles.interface.ts — values are persisted on role documents
 export enum EAppFeatures {
   gallery = "gallery",
   role = "role",
@@ -14,7 +15,11 @@ export enum EAppFeatures {
   photo = "photo",
   user = "user",
   brand = "brand",
-  productFilter = "porductFilter",
+  bulkUpload = "bulkUpload",
+  productFilter = "productFilter",
+  deals = "deals",
+  settings = "settings",
+  orders = "orders",
   banner = "banner",
 }
 

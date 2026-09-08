@@ -40,7 +40,7 @@ const BulkUploadResultPage = () => {
   }
 
   const handleGoToUpdate = (id: string) => {
-    router.push(`/product/create-product?updateId=${id}`);
+    router.push(`/products/${id}/edit`);
   };
 
   const columns: TCustomColumnDef<TSuccessData>[] = [
@@ -166,13 +166,13 @@ const BulkUploadResultPage = () => {
       <Tabs defaultValue="upload-history" className="mb-4 w-[400px]">
         <TabsList>
           <TabsTrigger
-            onClick={() => router.push("/product/bulk-upload")}
+            onClick={() => router.push("/products/bulk-upload")}
             value="bulk-upload"
           >
             Bulk upload
           </TabsTrigger>
           <TabsTrigger
-            onClick={() => router.push("/product/bulk-upload/result")}
+            onClick={() => router.push("/products/bulk-upload/result")}
             value="upload-history"
           >
             Upload History

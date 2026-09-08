@@ -226,7 +226,7 @@ const AllProducts = () => {
           <div className="flex gap-2">
             <Button variant={"view_button"} size={"base"} />
             <Button
-              onClick={() => router.push(`/product/update-product/${_id}`)}
+              onClick={() => router.push(`/products/${_id}/edit`)}
               variant={"edit_button"}
               size={"base"}
             />
@@ -271,7 +271,7 @@ const AllProducts = () => {
         buttons={
           <>
             <Button
-              onClick={() => router.push("/product/create-product")}
+              onClick={() => router.push("/products/create")}
               variant={"default"}
             >
               Create new product

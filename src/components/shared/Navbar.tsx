@@ -5,17 +5,9 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import Link from "next/link";
 import ImageGallery from "../product/ImageGallery";
 import NotificationMenu from "../notifications/NotificationMenu";
-import {
-  CircleUserRound,
-  Images,
-  LogOut,
-  Moon,
-  Settings,
-  Sun,
-} from "lucide-react";
+import { Images, LogOut, Moon, Sun } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
 import GlobalDropdown from "../common/GlobalDropdown";
 import { handleLogout } from "@/lib/utils";
@@ -59,20 +51,6 @@ const Navbar = () => {
               <GlobalDropdown
                 dropdownRender={
                   <>
-                    <Link
-                      href={"/my-profile"}
-                      className="flex items-center gap-3"
-                    >
-                      <CircleUserRound size={18} />
-                      <span>Profile</span>
-                    </Link>
-                    <Link
-                      href={"/settings"}
-                      className="flex items-center gap-3"
-                    >
-                      <Settings size={18} />
-                      <span>Settings</span>
-                    </Link>
                     <button
                       onClick={onLogout}
                       className="flex w-full items-center gap-3 rounded-md text-left px-2 py-1.5 text-sm hover:bg-background-foreground cursor-pointer"
