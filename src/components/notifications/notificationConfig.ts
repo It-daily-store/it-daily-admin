@@ -53,33 +53,33 @@ export const notificationConfig: Record<
     // A deleted product has no detail page left to open.
     route: (noti) =>
       noti.actionType === "delete" || !noti.source
-        ? "/product/all-products"
-        : `/product/update-product/${noti.source}`,
+        ? "/products"
+        : `/products/${noti.source}/edit`,
   },
   category: {
     icon: FolderTree,
     entityLabel: "category",
-    route: () => "/category",
+    route: () => "/categories",
   },
   productDetails: {
     icon: ListTree,
     entityLabel: "details category",
-    route: () => "/details-category",
+    route: () => "/detail-categories",
   },
   brand: {
     icon: Tag,
     entityLabel: "brand",
-    route: () => "/brand",
+    route: () => "/brands",
   },
   productFilter: {
     icon: SlidersHorizontal,
     entityLabel: "product filter",
-    route: () => "/product/filters",
+    route: () => "/products/filters",
   },
   bulkUpload: {
     icon: UploadCloud,
     entityLabel: "bulk upload",
-    route: () => "/product/bulk-upload",
+    route: () => "/products/bulk-upload",
   },
   role: {
     icon: ShieldCheck,

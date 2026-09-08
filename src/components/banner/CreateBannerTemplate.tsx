@@ -29,7 +29,7 @@ const CreateBannerTemplate = () => {
       toast.success(res.message);
       setOpen(false);
       setName("");
-      router.push(`/shop/banner-builder/${res.data._id}`);
+      router.push(`/storefront/banner-builder/${res.data._id}`);
     } catch (err) {
       globalError(err);
     }

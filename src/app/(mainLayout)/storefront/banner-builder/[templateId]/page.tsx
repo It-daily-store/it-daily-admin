@@ -95,7 +95,7 @@ export default function BannerEditPage() {
         buttons={
           <button
             type="button"
-            onClick={() => router.push("/shop/banner-builder")}
+            onClick={() => router.push("/storefront/banner-builder")}
             className="text-sm text-primary underline"
           >
             Back to list

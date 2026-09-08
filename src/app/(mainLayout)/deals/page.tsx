@@ -212,7 +212,7 @@ const DealsPage = () => {
         const _id = row.original._id;
         return (
           <div className="flex gap-2">
-            <Link href={`/offers/deals/${_id}`}>
+            <Link href={`/deals/${_id}`}>
               <Button
                 tooltip="Add product to deal"
                 variant={"create_button"}
@@ -258,7 +258,7 @@ const DealsPage = () => {
               Add Deal
             </Button>
             <Button
-              onClick={() => router.push("/offers/deals?view=list")}
+              onClick={() => router.push("/deals?view=list")}
               tooltip="List view"
               size={"icon"}
               variant={view !== "grid" ? "secondary" : "secondary_light"}
@@ -266,7 +266,7 @@ const DealsPage = () => {
               <List size={18} />
             </Button>
             <Button
-              onClick={() => router.push("/offers/deals?view=grid")}
+              onClick={() => router.push("/deals?view=grid")}
               tooltip="Grid view"
               size={"icon"}
               variant={view === "grid" ? "secondary" : "secondary_light"}

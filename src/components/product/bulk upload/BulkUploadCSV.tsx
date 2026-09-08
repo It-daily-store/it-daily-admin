@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { globalError } from "@/lib/utils";
 import UploadResults from "@/components/product/bulk upload/UploadResults";
 import { TBulkUploadResults } from "@/interface/product.interface";
-import { TMapedField } from "@/app/(mainLayout)/product/bulk-upload/page";
+import { TMapedField } from "@/app/(mainLayout)/products/bulk-upload/page";
 import { Button } from "@/components/ui/button";
 
 const BulkUploadCSV = () => {

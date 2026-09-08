@@ -103,7 +103,7 @@ export default function DealCard({ deal }: DealCardProps) {
         <div className="flex gap-2 mt-3 pt-3 border-t">
           <Button variant="view_button" size="sm" className="flex-1" />
           <Button
-            onClick={() => router.push(`/deal/update-deal/${deal._id}`)}
+            onClick={() => router.push(`/deals/${deal._id}`)}
             variant="edit_button"
             size="sm"
             className="flex-1"

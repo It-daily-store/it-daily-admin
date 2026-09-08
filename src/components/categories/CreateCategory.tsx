@@ -24,7 +24,7 @@ import {
   useGetAllCategoriesQuery,
 } from "@/redux/api/categories";
 import { toast } from "sonner";
-import { TParentCat } from "@/app/(mainLayout)/category/page";
+import { TParentCat } from "@/app/(mainLayout)/categories/page";
 import { globalError } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import slugify from "slugify";

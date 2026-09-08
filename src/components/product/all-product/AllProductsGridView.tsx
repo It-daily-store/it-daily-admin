@@ -105,9 +105,7 @@ const AllProductsGridView = ({ data }: { data: TProduct[] }) => {
             <div className="flex gap-2 mt-auto pt-3">
               <Button variant={"view_button"} size={"base"} />
               <Button
-                onClick={() =>
-                  router.push(`/product/update-product/${product?._id}`)
-                }
+                onClick={() => router.push(`/products/${product?._id}/edit`)}
                 variant={"edit_button"}
                 size={"base"}
               />
