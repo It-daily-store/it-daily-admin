@@ -24,15 +24,11 @@ import DeleteModal from "@/components/global/DeleteModal";
 import Modal from "@/components/custom/Modal";
 import { Input } from "@/components/ui/input";
 import CreateBannerTemplate from "@/components/banner/CreateBannerTemplate";
-import { useAppSelector } from "@/redux/hooks";
-import { EAppFeatures } from "@/interface/auth.interface";
+import { useCan } from "@/lib/permissions";
 
 const BannerBuilderPage = () => {
   const router = useRouter();
-  const { permissions } = useAppSelector((state) => state.auth);
-  const bannerPermission = permissions?.find(
-    (p) => p.feature === EAppFeatures.banner,
-  );
+  const can = useCan();
 
   const {
     data: templateData,
@@ -119,7 +115,7 @@ const BannerBuilderPage = () => {
       // the row being toggled: activation is exclusive server-side, so two
       // overlapping toggles would race over the single active slot.
       cell: ({ row }) =>
-        bannerPermission?.access.update ? (
+        can("can_publish_banner") ? (
           <Switch
             checked={row.original.is_active}
             disabled={isSettingActive}
@@ -159,7 +155,7 @@ const BannerBuilderPage = () => {
             variant={"edit_button"}
             size={"base"}
           ></Button>
-          {bannerPermission?.access.update && (
+          {can("can_update_banner") && (
             <Button
               variant={"outline"}
               size={"base"}
@@ -171,7 +167,7 @@ const BannerBuilderPage = () => {
               Rename
             </Button>
           )}
-          {bannerPermission?.access.create && (
+          {can("can_duplicate_banner") && (
             <Button
               variant={"outline"}
               size={"base"}
@@ -180,7 +176,7 @@ const BannerBuilderPage = () => {
               Duplicate
             </Button>
           )}
-          {bannerPermission?.access.delete && (
+          {can("can_delete_banner") && (
             <Button
               onClick={() => setDeleteOpen(row.original._id)}
               variant={"delete_button"}
@@ -202,7 +198,7 @@ const BannerBuilderPage = () => {
         title="Banner Builder"
         subtitle="Create and edit freeform banner templates. The storefront shows the one marked active — activating a template replaces the previous one."
         buttons={
-          bannerPermission?.access.create ? <CreateBannerTemplate /> : undefined
+          can("can_create_banner") ? <CreateBannerTemplate /> : undefined
         }
       />
 

@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,17 +19,16 @@ import {
 } from "../ui/alert-dialog";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import {
-  EAppFeatures,
-  TCrud,
-  TPermission,
-  TRole,
-} from "@/interface/auth.interface";
-import { Switch } from "../ui/switch";
+import { TModulePermission, TRole } from "@/interface/auth.interface";
+import PermissionMatrix from "./PermissionMatrix";
 import { createRoleValidationSchema } from "../utilities/validations/RoleValidation";
 import { ZodError } from "zod";
 import { toast } from "sonner";
-import { useCreateRoleMutation } from "@/redux/api/rolesApi";
+import {
+  TPermissionCatalog,
+  useCreateRoleMutation,
+  useGetPermissionCatalogQuery,
+} from "@/redux/api/rolesApi";
 import { globalError } from "@/lib/utils";
 import { Plus } from "lucide-react";
 
@@ -41,50 +40,10 @@ type TProps = {
 const CreateRoleModal = ({ open, setOpen }: TProps) => {
   const [description, setDescription] = useState<string>("");
   const [roleName, setRoleName] = useState<string>("");
-  const [permissions, setPermissions] = useState<TPermission[] | []>([]);
+  const { data: catalogRes } = useGetPermissionCatalogQuery(undefined);
+  const catalog: TPermissionCatalog = catalogRes?.data ?? [];
+  const [permissions, setPermissions] = useState<TModulePermission[]>([]);
   const [createRole, { isLoading: isCreating }] = useCreateRoleMutation();
-
-  const resetPermissions = () => {
-    setPermissions(
-      Object.values(EAppFeatures).map((feature) => ({
-        feature,
-        access: {
-          read: false,
-          create: false,
-          update: false,
-          delete: false,
-        },
-      })),
-    );
-  };
-
-  useEffect(() => {
-    resetPermissions();
-  }, []);
-
-  const handleAccessChange = (feature: string, accessName: keyof TCrud) => {
-    console.log(feature, accessName);
-
-    if (permissions.length > 0) {
-      setPermissions((prev) => {
-        return prev.map((permission: TPermission) => {
-          if (permission.feature === feature) {
-            const updatedAccess = {
-              ...permission.access,
-              [accessName]: !permission.access[accessName],
-            };
-
-            return {
-              ...permission,
-              access: updatedAccess,
-            };
-          } else {
-            return permission;
-          }
-        });
-      });
-    }
-  };
 
   const handleCreateRole = async () => {
     const payload: Pick<TRole, "role" | "description" | "permissions"> = {
@@ -113,7 +72,7 @@ const CreateRoleModal = ({ open, setOpen }: TProps) => {
       setOpen(false);
       setRoleName("");
       setDescription("");
-      resetPermissions();
+      setPermissions([]);
     } catch (err) {
       globalError(err);
     }
@@ -151,37 +110,12 @@ const CreateRoleModal = ({ open, setOpen }: TProps) => {
 
         <div>
           <h3 className="text-base font-semibold text-black">Permissions:</h3>
-          <div className="grid grid-cols-1 gap-2 pt-2 md:grid-cols-2 lg:grid-cols-3">
-            {permissions?.length > 0 &&
-              permissions?.map((permission: TPermission) => (
-                <div
-                  className="rounded-md bg-background p-3"
-                  key={permission.feature}
-                >
-                  <h4 className="mb-3 border-b border-border-color pb-2 font-semibold capitalize">
-                    {permission.feature}
-                  </h4>
-                  <div>
-                    {Object.entries(permission.access as TCrud).map((entry) => {
-                      const acc = entry as [keyof TCrud, boolean];
-                      return (
-                        <div
-                          key={acc[0]}
-                          className="flex items-center justify-between"
-                        >
-                          <span className="text-gray">{acc[0]}:</span>
-                          <Switch
-                            onCheckedChange={() =>
-                              handleAccessChange(permission.feature, acc[0])
-                            }
-                            checked={acc[1] === true}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+          <div className="pt-2">
+            <PermissionMatrix
+              catalog={catalog}
+              value={permissions}
+              onChange={setPermissions}
+            />
           </div>
         </div>
 

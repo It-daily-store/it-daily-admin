@@ -1,7 +1,7 @@
-import { TCrud, TPermission, TRole } from "@/interface/auth.interface";
+import { TModulePermission, TRole } from "@/interface/auth.interface";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import { Switch } from "../ui/switch";
+import PermissionMatrix from "./PermissionMatrix";
 import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -18,7 +18,11 @@ import {
 } from "../ui/alert-dialog";
 import { ZodError } from "zod";
 import { toast } from "sonner";
-import { useUpdateRoleMutation } from "@/redux/api/rolesApi";
+import {
+  TPermissionCatalog,
+  useGetPermissionCatalogQuery,
+  useUpdateRoleMutation,
+} from "@/redux/api/rolesApi";
 import { globalError } from "@/lib/utils";
 import { updateRoleValidationSchema } from "../utilities/validations/RoleValidation";
 
@@ -30,7 +34,9 @@ type TProps = {
 const EditRoleModal = ({ editData, setOpen }: TProps) => {
   const [description, setDescription] = useState<string | undefined>("");
   const [roleName, setRoleName] = useState<string | undefined>("");
-  const [permissions, setPermissions] = useState<TPermission[] | []>([]);
+  const { data: catalogRes } = useGetPermissionCatalogQuery(undefined);
+  const catalog: TPermissionCatalog = catalogRes?.data ?? [];
+  const [permissions, setPermissions] = useState<TModulePermission[]>([]);
   const [updateRole, { isLoading: isUpdating }] = useUpdateRoleMutation();
 
   useEffect(() => {
@@ -40,30 +46,6 @@ const EditRoleModal = ({ editData, setOpen }: TProps) => {
       setDescription(editData.description);
     }
   }, [editData]);
-
-  const handleAccessChange = (feature: string, accessName: keyof TCrud) => {
-    console.log(feature, accessName);
-
-    if (permissions.length > 0) {
-      setPermissions((prev) => {
-        return prev.map((permission: TPermission) => {
-          if (permission.feature === feature) {
-            const updatedAccess = {
-              ...permission.access,
-              [accessName]: !permission.access[accessName],
-            };
-
-            return {
-              ...permission,
-              access: updatedAccess,
-            };
-          } else {
-            return permission;
-          }
-        });
-      });
-    }
-  };
 
   const handleUpdate = async () => {
     if (!editData?._id) {
@@ -133,39 +115,12 @@ const EditRoleModal = ({ editData, setOpen }: TProps) => {
 
           <div>
             <h3 className="text-base font-semibold text-black">Permissions:</h3>
-            <div className="grid grid-cols-1 gap-2 pt-2 md:grid-cols-2 lg:grid-cols-3">
-              {permissions?.length > 0 &&
-                permissions?.map((permission: TPermission) => (
-                  <div
-                    className="rounded-md bg-background p-3"
-                    key={permission.feature}
-                  >
-                    <h4 className="mb-3 border-b border-border-color pb-2 font-semibold capitalize">
-                      {permission.feature}
-                    </h4>
-                    <div>
-                      {Object.entries(permission.access as TCrud).map(
-                        (entry) => {
-                          const acc = entry as [keyof TCrud, boolean];
-                          return (
-                            <div
-                              key={acc[0]}
-                              className="flex items-center justify-between"
-                            >
-                              <span className="text-gray">{acc[0]}:</span>
-                              <Switch
-                                onCheckedChange={() =>
-                                  handleAccessChange(permission.feature, acc[0])
-                                }
-                                checked={acc[1] === true}
-                              />
-                            </div>
-                          );
-                        },
-                      )}
-                    </div>
-                  </div>
-                ))}
+            <div className="pt-2">
+              <PermissionMatrix
+                catalog={catalog}
+                value={permissions}
+                onChange={setPermissions}
+              />
             </div>
           </div>
 

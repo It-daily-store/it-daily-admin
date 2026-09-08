@@ -1,4 +1,5 @@
 "use client";
+import PermissionGuard from "@/components/global/PermissionGuard";
 import GlobalTable, {
   TCustomColumnDef,
 } from "@/components/common/GlobalTable/GlobalTable";
@@ -111,44 +112,46 @@ const AddProductsToDealPage = () => {
   ];
 
   return (
-    <div>
-      <PageHeader
-        title="➕ Add Products to Deal"
-        subtitle="Select and assign products to promotional deals for better visibility and sales."
-        buttons={
-          <div>
-            <Sheet modal>
-              <SheetTrigger asChild>
-                <Button>Add Products</Button>
-              </SheetTrigger>
-              <SheetContent
-                className="sm:max-w-4xl h-screen overflow-y-auto"
-                onInteractOutside={(e) => e.preventDefault()}
-                // prevent closing with Esc
-                onEscapeKeyDown={(e) => e.preventDefault()}
-              >
-                <SheetHeader className="pb-0">
-                  <SheetTitle>
-                    <h2>Add products to this deal</h2>
-                  </SheetTitle>
-                  <p className="text-sm text-dark-gray">
-                    Select products, add custom discount and save
-                  </p>
-                </SheetHeader>
-                {dealId && <AddProductsToDeal dealId={dealId as string} />}
-              </SheetContent>
-            </Sheet>
-          </div>
-        }
-      />
+    <PermissionGuard permission="can_read_deal_details">
+      <div>
+        <PageHeader
+          title="➕ Add Products to Deal"
+          subtitle="Select and assign products to promotional deals for better visibility and sales."
+          buttons={
+            <div>
+              <Sheet modal>
+                <SheetTrigger asChild>
+                  <Button>Add Products</Button>
+                </SheetTrigger>
+                <SheetContent
+                  className="sm:max-w-4xl h-screen overflow-y-auto"
+                  onInteractOutside={(e) => e.preventDefault()}
+                  // prevent closing with Esc
+                  onEscapeKeyDown={(e) => e.preventDefault()}
+                >
+                  <SheetHeader className="pb-0">
+                    <SheetTitle>
+                      <h2>Add products to this deal</h2>
+                    </SheetTitle>
+                    <p className="text-sm text-dark-gray">
+                      Select products, add custom discount and save
+                    </p>
+                  </SheetHeader>
+                  {dealId && <AddProductsToDeal dealId={dealId as string} />}
+                </SheetContent>
+              </Sheet>
+            </div>
+          }
+        />
 
-      <GlobalTable
-        defaultColumns={productColumn}
-        data={products}
-        limit={10}
-        tableName="single_deal_table"
-      />
-    </div>
+        <GlobalTable
+          defaultColumns={productColumn}
+          data={products}
+          limit={10}
+          tableName="single_deal_table"
+        />
+      </div>
+    </PermissionGuard>
   );
 };
 

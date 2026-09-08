@@ -1,4 +1,4 @@
-import { TPermission, TRole } from "@/interface/auth.interface";
+import { TRole } from "@/interface/auth.interface";
 import React from "react";
 import {
   Dialog,
@@ -6,7 +6,11 @@ import {
   DialogDescription,
   DialogTitle,
 } from "../ui/dialog";
-import { Switch } from "../ui/switch";
+import PermissionMatrix from "./PermissionMatrix";
+import {
+  TPermissionCatalog,
+  useGetPermissionCatalogQuery,
+} from "@/redux/api/rolesApi";
 
 type TProps = {
   viewData: TRole | null;
@@ -14,6 +18,9 @@ type TProps = {
 };
 
 const ViewRoleModal = ({ viewData, setOpen }: TProps) => {
+  const { data: catalogRes } = useGetPermissionCatalogQuery(undefined);
+  const catalog: TPermissionCatalog = catalogRes?.data ?? [];
+
   return (
     <div>
       <Dialog open={viewData !== null} onOpenChange={() => setOpen(null)}>
@@ -34,34 +41,12 @@ const ViewRoleModal = ({ viewData, setOpen }: TProps) => {
 
           <div>
             <h3 className="text-base font-semibold text-black">Permissions:</h3>
-            <div className="grid grid-cols-1 gap-2 pt-2 md:grid-cols-2 lg:grid-cols-3">
-              {viewData?.permissions.map((permission: TPermission) => (
-                <div
-                  className="rounded-md bg-background p-3"
-                  key={permission.feature}
-                >
-                  <h4 className="mb-3 border-b border-border-color pb-2 font-semibold capitalize">
-                    {permission.feature}
-                  </h4>
-                  <div>
-                    {Object.entries(permission.access).map(
-                      (acc: [string, boolean]) => {
-                        console.log(acc);
-                        return (
-                          <div
-                            key={acc[0]}
-                            className="flex items-center justify-between"
-                          >
-                            <span className="flex-1 text-gray">{acc[0]}</span>
-                            <span className="flex-1">:</span>
-                            <Switch checked={acc[1] === true} />
-                          </div>
-                        );
-                      },
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="pt-2">
+              <PermissionMatrix
+                catalog={catalog}
+                value={viewData?.permissions ?? []}
+                readOnly
+              />
             </div>
           </div>
         </DialogContent>

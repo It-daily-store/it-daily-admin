@@ -1,16 +1,9 @@
-import { EAppFeatures } from "@/interface/auth.interface";
+import { EAppModules } from "@/interface/auth.interface";
 import { z } from "zod";
 
-export const TCrudSchema = z.object({
-  read: z.boolean().default(false),
-  create: z.boolean().default(false),
-  update: z.boolean().default(false),
-  delete: z.boolean().default(false),
-});
-
-export const TPermissionSchema = z.object({
-  feature: z.nativeEnum(EAppFeatures),
-  access: TCrudSchema,
+export const TModulePermissionSchema = z.object({
+  module: z.nativeEnum(EAppModules),
+  permissions: z.record(z.string(), z.boolean()),
 });
 
 export const updateRoleValidationSchema = z.object({
@@ -22,7 +15,7 @@ export const updateRoleValidationSchema = z.object({
     .string({ error: "Descriptio should be string" })
     .max(400, "Description can't be more than 400 characters")
     .optional(),
-  permissions: z.array(TPermissionSchema).optional(),
+  permissions: z.array(TModulePermissionSchema).optional(),
 });
 
 export const createRoleValidationSchema = z.object({
@@ -33,5 +26,5 @@ export const createRoleValidationSchema = z.object({
     .string({ error: "Descriptio should be string" })
     .max(400, "Description can't be more than 400 characters")
     .optional(),
-  permissions: z.array(TPermissionSchema).optional(),
+  permissions: z.array(TModulePermissionSchema).optional(),
 });

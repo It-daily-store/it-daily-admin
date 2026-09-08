@@ -1,4 +1,5 @@
 "use client";
+import PermissionGuard from "@/components/global/PermissionGuard";
 import { useAppDispatch } from "@/redux/hooks";
 import React, { ReactNode, useEffect, useState } from "react";
 import AddBasicData from "@/components/product/createProduct/AddBasicData";
@@ -218,7 +219,7 @@ const UpdateProduct = () => {
   };
 
   return (
-    <>
+    <PermissionGuard permission="can_update_product">
       <div>
         <PageHeader
           title={productId === null ? "Create Product" : "Update Product"}
@@ -283,7 +284,7 @@ const UpdateProduct = () => {
           )}
         </div>
       </div>
-    </>
+    </PermissionGuard>
   );
 };
 

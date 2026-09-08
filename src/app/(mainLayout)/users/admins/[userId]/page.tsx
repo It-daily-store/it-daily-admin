@@ -1,4 +1,5 @@
 "use client";
+import PermissionGuard from "@/components/global/PermissionGuard";
 import { TUser } from "@/interface/auth.interface";
 import { globalError } from "@/lib/utils";
 import { useGetSingleUserQuery } from "@/redux/api/usersApi";
@@ -23,13 +24,17 @@ const AdminDetails = (props: {
   const userData: TUser = data?.data;
 
   return (
-    <div>
-      {!isLoading && userData && (
-        <div className="flex items-center justify-between pb-4">
-          <h4 className="page-title">Admin Info {`: ${userData?.fullName}`}</h4>
-        </div>
-      )}
-    </div>
+    <PermissionGuard permission="can_read_user_details">
+      <div>
+        {!isLoading && userData && (
+          <div className="flex items-center justify-between pb-4">
+            <h4 className="page-title">
+              Admin Info {`: ${userData?.fullName}`}
+            </h4>
+          </div>
+        )}
+      </div>
+    </PermissionGuard>
   );
 };
 

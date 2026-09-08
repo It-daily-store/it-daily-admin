@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { globalError } from "@/lib/utils";
-import { TPermission, TRole } from "@/interface/auth.interface";
+import { TRole } from "@/interface/auth.interface";
 import { useDeleteRoleMutation, useGetRolesQuery } from "@/redux/api/rolesApi";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -22,19 +22,18 @@ import DeleteModal from "@/components/global/DeleteModal";
 import { toast } from "sonner";
 import NoData from "@/components/shared/NoData";
 import PageHeader from "@/components/common/PageHeader";
+import { useCan } from "@/lib/permissions";
 
 const Roles = () => {
   const { data: rolesData, isLoading, error } = useGetRolesQuery(undefined);
   const [veiwData, setViewData] = useState<TRole | null>(null);
   const [editData, setEditData] = useState<TRole | null>(null);
-  const { permissions, user } = useAppSelector((s) => s.auth);
+  const { user } = useAppSelector((s) => s.auth);
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteRole, { isLoading: isDeleting }] = useDeleteRoleMutation();
   const [roleToDelete, setRoleToDelete] = useState<TRole | null>(null);
 
-  const rolePermission: TPermission | undefined = permissions?.find(
-    (p) => p.feature === "role",
-  );
+  const can = useCan();
 
   if (!isLoading && error) {
     globalError(error);
@@ -97,22 +96,20 @@ const Roles = () => {
                     variant={"view_button"}
                     size={"base"}
                   ></Button>
-                  {rolePermission?.access.update &&
-                    user?.role._id !== role._id && (
-                      <Button
-                        onClick={() => setEditData(role)}
-                        variant={"edit_button"}
-                        size={"base"}
-                      ></Button>
-                    )}
-                  {rolePermission?.access.delete &&
-                    user?.role._id !== role._id && (
-                      <Button
-                        onClick={() => setRoleToDelete(role)}
-                        variant={"delete_button"}
-                        size={"base"}
-                      ></Button>
-                    )}
+                  {can("can_update_role") && user?.role._id !== role._id && (
+                    <Button
+                      onClick={() => setEditData(role)}
+                      variant={"edit_button"}
+                      size={"base"}
+                    ></Button>
+                  )}
+                  {can("can_delete_role") && user?.role._id !== role._id && (
+                    <Button
+                      onClick={() => setRoleToDelete(role)}
+                      variant={"delete_button"}
+                      size={"base"}
+                    ></Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
