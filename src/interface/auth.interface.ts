@@ -86,7 +86,12 @@ export type TPermissionKey =
   | "can_read_bulk_upload_history"
   | "can_see_pc_builder_page"
   | "can_read_settings"
-  | "can_update_settings";
+  | "can_update_settings"
+  | "can_see_meta_pixel_page"
+  | "can_read_marketing"
+  | "can_update_marketing"
+  | "can_read_meta_pixel_logs"
+  | "can_retry_meta_pixel_event";
 
 export type TModulePermission = {
   module: EAppModules;
