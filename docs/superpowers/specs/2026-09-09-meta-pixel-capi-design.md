@@ -36,7 +36,7 @@ has left the site.
 alone.** Sending `InitiateCheckout` and `Purchase` with the same id does not
 tell Meta they belong to one funnel. What links a funnel is the user identity
 carried on each event: `fbp`, `fbc`, client IP, user agent, hashed PII. So
-`event_id` is used here for its real purpose — collapsing the *same* event sent
+`event_id` is used here for its real purpose — collapsing the _same_ event sent
 twice (browser copy + server copy, or a thank-you page refresh).
 
 **Purchase-on-delivered trades attribution for accuracy.** `event_time` is the
@@ -48,29 +48,29 @@ tradeoff; `checkout_success` remains mappable for an early funnel signal.
 
 ## Decisions
 
-| Question | Decision |
-|---|---|
-| Module placement | Own backend module `metaPixel`, not inside `settings` |
-| Platform scope | Meta only, no generic provider abstraction |
-| Pixel count | Exactly one pixel/dataset |
-| Environments | Single config + Meta `test_event_code` field |
-| Token storage | AES-256-GCM encrypted at rest; API returns last 4 only |
-| RBAC | New `EAppModules.marketing` with read/update permissions |
-| Event mapping | Fixed code-defined trigger registry; admin remaps event names |
-| Channels | Per-trigger `sendViaBrowser` / `sendViaCapi` toggles |
-| Event names | Meta standard list + free-text custom option |
-| `value` | Goods only, after discount; excludes shipping and tax |
-| `content_ids` | Default `sku`, admin-selectable (`sku` / `_id` / `slug`) |
-| Status triggers | Rule list: any status to any event, each independently toggled |
-| Payment conditions on rules | Not in v1 |
-| Idempotency | Per-order sent-event ledger |
-| PII | SHA-256 hashed at order creation; raw PII never duplicated |
-| Delivery | Detached send + interval retry worker; no Redis |
-| Observability | Admin event log page in v1 |
-| Consent | Skipped |
-| Extras in v1 | Test connection, global kill switch, preview payload, excluded IPs |
-| Purchase default | `delivered` to `Purchase`, seeded enabled |
-| Currency | Single currency, `currency` field defaulting to `BDT` |
+| Question                    | Decision                                                           |
+| --------------------------- | ------------------------------------------------------------------ |
+| Module placement            | Own backend module `metaPixel`, not inside `settings`              |
+| Platform scope              | Meta only, no generic provider abstraction                         |
+| Pixel count                 | Exactly one pixel/dataset                                          |
+| Environments                | Single config + Meta `test_event_code` field                       |
+| Token storage               | AES-256-GCM encrypted at rest; API returns last 4 only             |
+| RBAC                        | New `EAppModules.marketing` with read/update permissions           |
+| Event mapping               | Fixed code-defined trigger registry; admin remaps event names      |
+| Channels                    | Per-trigger `sendViaBrowser` / `sendViaCapi` toggles               |
+| Event names                 | Meta standard list + free-text custom option                       |
+| `value`                     | Goods only, after discount; excludes shipping and tax              |
+| `content_ids`               | Default `sku`, admin-selectable (`sku` / `_id` / `slug`)           |
+| Status triggers             | Rule list: any status to any event, each independently toggled     |
+| Payment conditions on rules | Not in v1                                                          |
+| Idempotency                 | Per-order sent-event ledger                                        |
+| PII                         | SHA-256 hashed at order creation; raw PII never duplicated         |
+| Delivery                    | Detached send via a BullMQ queue, reusing the existing Redis       |
+| Observability               | Admin event log page in v1                                         |
+| Consent                     | Skipped                                                            |
+| Extras in v1                | Test connection, global kill switch, preview payload, excluded IPs |
+| Purchase default            | `delivered` to `Purchase`, seeded enabled                          |
+| Currency                    | Single currency, `currency` field defaulting to `BDT`              |
 
 ## Data model
 
@@ -88,7 +88,7 @@ module file shape (`.interface`, `.model`, `.validation`, `.service`,
   (`sku` | `_id` | `slug`), `contentType` (`product`)
 - **Hygiene**: `excludedIps: string[]` (IPs and CIDRs), `blockBots: boolean`
 - **`triggers[]`**: `{ key, eventName, isCustomEvent, enabled, sendViaBrowser,
-  sendViaCapi }` — one entry per registry key. `sendViaCapi` is only valid on
+sendViaCapi }` — one entry per registry key. `sendViaCapi` is only valid on
   backend-visible keys and is forced false while `capiEnabled` is false.
 - **`statusRules[]`**: `{ id, status, eventName, isCustomEvent, enabled }`
 - `lastUpdatedBy`, timestamps
@@ -106,8 +106,8 @@ Written once at order creation, never updated afterwards.
   lowercase; phone reduced to E.164 digits): `em`, `ph`, `fn`, `ln`, `ct`,
   `st`, `zp`, `country`, `external_id`
 - **`sentEvents[]`** (the ledger): `{ eventName, eventId, status:
-  queued|sent|failed|dead, attempts, sentAt, metaResponse, fbtraceId,
-  nextRetryAt }`
+queued|sent|failed|dead, attempts, sentAt, metaResponse, fbtraceId,
+nextRetryAt }`
 
 Raw customer PII is never copied into `trackingData`. Hashes are computed at
 order creation because the delayed status-triggered events fire when no browser
@@ -130,22 +130,22 @@ Defined in code (`metaPixel.constants.ts`, mirrored in the storefront), not in
 the database. Admin can remap the event name and toggle channels, but cannot
 add or remove keys — a key with no call site could never fire.
 
-| key | backend-visible | default event | default state |
-|---|---|---|---|
-| `page_view` | no | PageView | on |
-| `product_view` | no | ViewContent | on |
-| `category_view` | no | ViewContent | on |
-| `search` | no | Search | on |
-| `add_to_cart` | yes | AddToCart | on |
-| `cart_view` | no | — | off |
-| `wishlist_add` | no | AddToWishlist | on |
-| `compare_add` | no | — | off |
-| `checkout_start` | yes | InitiateCheckout | on |
-| `checkout_success` | yes | — | off |
-| `signup` | yes | CompleteRegistration | on |
-| `login` | yes | — | off |
-| `pc_builder_save` | yes | CustomizeProduct | on |
-| `contact_submit` | yes | Contact | on |
+| key                | backend-visible | default event        | default state |
+| ------------------ | --------------- | -------------------- | ------------- |
+| `page_view`        | no              | PageView             | on            |
+| `product_view`     | no              | ViewContent          | on            |
+| `category_view`    | no              | ViewContent          | on            |
+| `search`           | no              | Search               | on            |
+| `add_to_cart`      | yes             | AddToCart            | on            |
+| `cart_view`        | no              | —                    | off           |
+| `wishlist_add`     | no              | AddToWishlist        | on            |
+| `compare_add`      | no              | —                    | off           |
+| `checkout_start`   | yes             | InitiateCheckout     | on            |
+| `checkout_success` | yes             | —                    | off           |
+| `signup`           | yes             | CompleteRegistration | on            |
+| `login`            | yes             | —                    | off           |
+| `pc_builder_save`  | yes             | CustomizeProduct     | on            |
+| `contact_submit`   | yes             | Contact              | on            |
 
 Because the registry is a shared typed constant, a mistyped trigger key is a
 compile error rather than a silently dead event.
@@ -195,20 +195,23 @@ That function:
 
 ### Sending, retry, hygiene
 
-`sendToMeta()` posts to `https://graph.facebook.com/v21.0/{pixelId}/events`. It
-is always invoked detached from the HTTP request, so Meta latency or downtime
-never slows or fails an admin's status update. Every outcome is written to both
-the order ledger and the event log.
+`sendToMeta()` posts to `https://graph.facebook.com/v21.0/{pixelId}/events`.
+Sends are dispatched through a BullMQ queue (`metaPixel.queue.ts`), reusing the
+Redis connection and the `<module>.queue.ts` pattern already established by
+`product.queue.ts` and `deal.queue.ts`. The HTTP request only enqueues, so Meta
+latency or downtime never slows or fails an admin's status update, and a server
+restart mid-send does not lose the event. Every outcome is written to both the
+order ledger and the event log.
 
-Failure classification:
+Retry policy is the queue's: `attempts: 5` with exponential backoff starting at
+60s. Failure classification decides whether a retry is attempted at all:
 
-- 4xx caused by configuration (bad token, unknown pixel) becomes `dead`
-  immediately; retrying cannot help.
-- Network errors, 5xx, 429 become `failed` with `nextRetryAt`.
-
-A `setInterval` worker started in `server.ts` sweeps every 2 minutes and retries
-due entries with backoff 1m, 5m, 30m, 2h, then marks them `dead`. No new
-infrastructure dependency.
+- 4xx caused by configuration (bad token, unknown pixel) is non-retryable. The
+  job throws BullMQ's `UnrecoverableError` so retries stop immediately, and the
+  ledger entry is marked `dead`.
+- Network errors, 5xx and 429 throw a normal error, so the queue retries with
+  backoff. After the final attempt the worker's `failed` handler marks the entry
+  `dead`.
 
 `excludedIps` and bot filtering apply on the server path via CIDR match on
 `clientIp` and a crawler UA regex. For the browser path, `public-config`
@@ -217,16 +220,16 @@ fires nothing.
 
 ## API surface
 
-| Method | Path | Permission |
-|---|---|---|
-| GET | `/meta-pixel/public-config` | none (storefront); masked |
-| GET | `/meta-pixel/config` | `can_read_marketing` |
-| PUT | `/meta-pixel/config` | `can_update_marketing` |
-| POST | `/meta-pixel/test-connection` | `can_update_marketing` |
-| POST | `/meta-pixel/preview-payload` | `can_read_marketing` |
-| GET | `/meta-pixel/logs` | `can_read_marketing` |
-| POST | `/meta-pixel/logs/:id/retry` | `can_update_marketing` |
-| POST | `/meta-pixel/events` | none (storefront ingress, rate-limited) |
+| Method | Path                          | Permission                              |
+| ------ | ----------------------------- | --------------------------------------- |
+| GET    | `/meta-pixel/public-config`   | none (storefront); masked               |
+| GET    | `/meta-pixel/config`          | `can_read_marketing`                    |
+| PUT    | `/meta-pixel/config`          | `can_update_marketing`                  |
+| POST   | `/meta-pixel/test-connection` | `can_update_marketing`                  |
+| POST   | `/meta-pixel/preview-payload` | `can_read_marketing`                    |
+| GET    | `/meta-pixel/logs`            | `can_read_marketing`                    |
+| POST   | `/meta-pixel/logs/:id/retry`  | `can_update_marketing`                  |
+| POST   | `/meta-pixel/events`          | none (storefront ingress, rate-limited) |
 
 `test-connection` sends a real test event with the saved credentials and returns
 the raw Meta response. A successful test is what unlocks `capiEnabled`, and
@@ -311,8 +314,10 @@ manual and staged:
 4. Place a test order, then advance it to `delivered`, and confirm exactly one
    `Purchase` in the event log and in Events Manager. Flip the status away and
    back and confirm no second send.
-5. Set an invalid token and confirm the send is marked `dead` (not retried) and
-   surfaces in the log; set an unreachable host and confirm backoff retries.
+5. Set an invalid token and confirm the send is marked `dead` after a single
+   attempt (no retries) and surfaces in the log; point the Graph host at an
+   unreachable address and confirm the queue retries with backoff before going
+   `dead` on the fifth attempt.
 6. Add your own IP to `excludedIps` and confirm the storefront fires nothing.
 7. Toggle the global kill switch and confirm both paths go silent.
 
@@ -328,9 +333,11 @@ manual and staged:
 - **Token expiry** — long-lived system-user tokens can still be revoked.
   `tokenVerifiedAt` is recorded; a health warning when no successful send has
   occurred in 24 hours is a natural follow-up.
-- **Interval worker and multiple instances** — if the backend is ever scaled to
-  more than one instance, the retry sweep would run concurrently. Mitigated by
-  an atomic find-and-update claim on retry entries.
+- **Redis becomes a hard dependency for CAPI sends** — if Redis is unreachable,
+  events queue nowhere. Redis is already required for the product and deal
+  queues so this adds no new infrastructure, but the enqueue call must be
+  wrapped so a Redis failure records a `dead` ledger entry rather than throwing
+  into the order-status request.
 - **Orders predating the feature have no `trackingData`** — a status rule firing
   on one of them would send an event with no identity data, which Meta cannot
   match. Such sends are skipped and recorded in the log as `dead` with a
