@@ -240,10 +240,17 @@ returns the exact JSON that would be sent, without sending it.
 
 ## RBAC
 
-Add `EAppModules.marketing` to the roles enum with `can_read_marketing` and
-`can_update_marketing`. Existing role documents need a one-off migration script
-to append the new permission block, defaulting to no access for every role
-except super-admin.
+Add `EAppModules.marketing` to the roles enum, with `can_see_meta_pixel_page`,
+`can_read_marketing`, `can_update_marketing`, `can_read_meta_pixel_logs` and
+`can_retry_meta_pixel_event` in `PERMISSION_CATALOG`.
+
+No role migration is required. `checkPermission` denies when a role document has
+no entry for the module (`granted !== true`), and `isMasterAdmin` short-circuits
+before any lookup — so existing roles default to no access and the master admin
+has access immediately. `PERMISSION_CATALOG` is declared
+`satisfies Record<EAppModules, readonly TPermissionDef[]>` and `MODULE_LABELS` is
+a `Record<EAppModules, string>`, so adding the enum value fails the build until
+both are updated.
 
 ## Admin UI
 
