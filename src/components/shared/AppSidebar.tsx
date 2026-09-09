@@ -209,7 +209,7 @@ export function AppSidebar() {
                       key={menu.link}
                       className={
                         active && !menu.children?.length
-                          ? "bg-sidebar-primary text-sidebar-accent-foreground hover:text-sidebar-accent-foreground"
+                          ? "bg-sidebar-primary text-sidebar-accent-foreground hover:text-sidebar-accent-foreground rounded-md"
                           : ""
                       }
                     >
