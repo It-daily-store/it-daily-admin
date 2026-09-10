@@ -1,6 +1,8 @@
 "use client";
 
 import PageHeader from "@/components/common/PageHeader";
+import MetaPixelHygieneTab from "@/components/marketing/MetaPixelHygieneTab";
+import MetaPixelSetupTab from "@/components/marketing/MetaPixelSetupTab";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -153,10 +155,11 @@ const MetaPixelPage = () => {
         </TabsList>
 
         <TabsContent value="setup">
-          <TabPlaceholder
-            title="Credentials and connection test"
-            description="Pixel ID, dataset ID, access token and test event code are entered here, then verified against Meta before the Conversions API can be switched on."
-          />
+          {isLoading ? (
+            <Skeleton className="h-72 w-full rounded-lg" />
+          ) : (
+            config && <MetaPixelSetupTab config={config} />
+          )}
         </TabsContent>
         <TabsContent value="events">
           <TabPlaceholder
@@ -171,10 +174,11 @@ const MetaPixelPage = () => {
           />
         </TabsContent>
         <TabsContent value="hygiene">
-          <TabPlaceholder
-            title="Tracking hygiene"
-            description="The tracking kill switch, excluded IP addresses and bot filtering live here."
-          />
+          {isLoading ? (
+            <Skeleton className="h-72 w-full rounded-lg" />
+          ) : (
+            config && <MetaPixelHygieneTab config={config} />
+          )}
         </TabsContent>
       </Tabs>
     </div>
