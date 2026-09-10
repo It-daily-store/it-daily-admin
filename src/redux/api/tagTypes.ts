@@ -17,6 +17,8 @@ export enum tagTypes {
   banner = "banner",
   singleBanner = "singleBanner",
   permissionCatalog = "permissionCatalog",
+  metaPixel = "metaPixel",
+  metaPixelLogs = "metaPixelLogs",
 }
 
 export const tagTypesList = [
@@ -38,4 +40,6 @@ export const tagTypesList = [
   tagTypes.banner,
   tagTypes.singleBanner,
   tagTypes.permissionCatalog,
+  tagTypes.metaPixel,
+  tagTypes.metaPixelLogs,
 ];
