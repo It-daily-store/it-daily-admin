@@ -14,6 +14,7 @@ export enum EAppModules {
   settings = "settings",
   orders = "orders",
   banner = "banner",
+  marketing = "marketing",
 }
 
 export type TPermissionKey =
