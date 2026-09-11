@@ -56,6 +56,20 @@ export type TMetaPixelLog = {
   createdAt: string;
 };
 
+export type TMetaPixelSentEvent = {
+  eventName: string;
+  eventId: string;
+  status: TSentEventStatus;
+  attempts: number;
+  sentAt?: string;
+  fbtraceId?: string;
+  errorMessage?: string;
+};
+
+export type TOrderTrackingData = {
+  sentEvents?: TMetaPixelSentEvent[];
+};
+
 export type TTestConnectionResult = {
   ok: boolean;
   httpStatus?: number;

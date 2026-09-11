@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Link from "next/link";
 
+import OrderMetaEventsCard from "@/components/marketing/OrderMetaEventsCard";
 import OrderStatusTimeline from "@/components/orders/OrderStatusTimeline";
 import { getOrderStatusConfig } from "@/components/orders/orderStatus";
 import {
@@ -50,6 +51,7 @@ import {
 import PageHeader from "@/components/common/PageHeader";
 import { useEffect } from "react";
 import { IOrder } from "@/interface/order.interface";
+import { useCan } from "@/lib/permissions";
 
 const formSchema = z.object({
   currentStatus: z.enum([
@@ -83,6 +85,7 @@ type FormValues = z.infer<typeof formSchema>;
 const OrderDetailsPage = () => {
   const { orderNumber } = useParams();
   const router = useRouter();
+  const can = useCan();
 
   const { data, isLoading, error } = useGetOrderByIdQuery(
     orderNumber as string,
@@ -275,6 +278,12 @@ const OrderDetailsPage = () => {
                 <OrderStatusTimeline history={order.statusHistory} />
               </CardContent>
             </Card>
+
+            {can("can_read_meta_pixel_logs") && (
+              <OrderMetaEventsCard
+                sentEvents={order.trackingData?.sentEvents}
+              />
+            )}
           </div>
 
           <div className="lg:col-span-2 space-y-4">

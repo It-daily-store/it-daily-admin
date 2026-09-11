@@ -1,3 +1,4 @@
+import { TOrderTrackingData } from "./metaPixel.interface";
 import { TUser } from "./auth.interface";
 export interface IAddress {
   address: string;
@@ -79,6 +80,7 @@ export interface IOrder {
     | "returned";
   shippingMethod: "standard" | "express" | "overnight";
   notes?: string;
+  trackingData?: TOrderTrackingData;
   createdAt: string;
   updatedAt: string;
 }

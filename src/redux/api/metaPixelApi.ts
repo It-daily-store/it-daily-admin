@@ -41,7 +41,7 @@ const metaPixelApi = baseApi.injectEndpoints({
       {
         data: TMetaPixelLog[];
         pagination: {
-          page: number;
+          currentPage: number;
           limit: number;
           total: number;
           totalPage: number;
