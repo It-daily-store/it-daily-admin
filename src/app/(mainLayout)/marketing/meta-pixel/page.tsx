@@ -4,6 +4,7 @@ import PageHeader from "@/components/common/PageHeader";
 import MetaPixelEventsTab from "@/components/marketing/MetaPixelEventsTab";
 import MetaPixelHygieneTab from "@/components/marketing/MetaPixelHygieneTab";
 import MetaPixelSetupTab from "@/components/marketing/MetaPixelSetupTab";
+import MetaPixelStatusRulesTab from "@/components/marketing/MetaPixelStatusRulesTab";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +20,7 @@ import { cn, globalError } from "@/lib/utils";
 import { useGetMetaPixelConfigQuery } from "@/redux/api/metaPixelApi";
 import { Check, Minus, ScrollText } from "lucide-react";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { useState } from "react";
 
 type TSetupStep = {
   label: string;
@@ -94,26 +95,9 @@ const SetupStatusStrip = ({
   );
 };
 
-const TabPlaceholder = ({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: string;
-  children?: ReactNode;
-}) => (
-  <div className="bg-card rounded-lg border p-4">
-    <h5 className="text-sm font-semibold">{title}</h5>
-    <p className="text-muted-foreground mt-1 max-w-2xl text-sm">
-      {description}
-    </p>
-    {children}
-  </div>
-);
-
 const MetaPixelPage = () => {
   const can = useCan();
+  const [tab, setTab] = useState("setup");
   const { data, isLoading, error } = useGetMetaPixelConfigQuery(undefined);
 
   if (!isLoading && error) globalError(error);
@@ -139,7 +123,7 @@ const MetaPixelPage = () => {
 
       <SetupStatusStrip config={config} isLoading={isLoading} />
 
-      <Tabs defaultValue="setup" className="gap-4">
+      <Tabs value={tab} onValueChange={setTab} className="gap-4">
         <TabsList className="h-auto w-full flex-wrap justify-start gap-1 p-1 sm:w-fit">
           <TabsTrigger className="px-3 py-1.5" value="setup">
             Setup
@@ -170,10 +154,16 @@ const MetaPixelPage = () => {
           )}
         </TabsContent>
         <TabsContent value="rules">
-          <TabPlaceholder
-            title="Order status rules"
-            description="Rules that send a server-side event when an order reaches a chosen status — this is where the Purchase event is sent from."
-          />
+          {isLoading ? (
+            <Skeleton className="h-72 w-full rounded-lg" />
+          ) : (
+            config && (
+              <MetaPixelStatusRulesTab
+                config={config}
+                onGoToSetup={() => setTab("setup")}
+              />
+            )
+          )}
         </TabsContent>
         <TabsContent value="hygiene">
           {isLoading ? (
