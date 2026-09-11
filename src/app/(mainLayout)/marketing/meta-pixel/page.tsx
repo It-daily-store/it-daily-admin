@@ -1,6 +1,7 @@
 "use client";
 
 import PageHeader from "@/components/common/PageHeader";
+import MetaPixelEventsTab from "@/components/marketing/MetaPixelEventsTab";
 import MetaPixelHygieneTab from "@/components/marketing/MetaPixelHygieneTab";
 import MetaPixelSetupTab from "@/components/marketing/MetaPixelSetupTab";
 import { Button } from "@/components/ui/button";
@@ -162,10 +163,11 @@ const MetaPixelPage = () => {
           )}
         </TabsContent>
         <TabsContent value="events">
-          <TabPlaceholder
-            title="Storefront trigger registry"
-            description="Each storefront trigger point is mapped to a Meta event here, with independent browser and server-side delivery switches."
-          />
+          {isLoading ? (
+            <Skeleton className="h-[32rem] w-full rounded-lg" />
+          ) : (
+            config && <MetaPixelEventsTab config={config} />
+          )}
         </TabsContent>
         <TabsContent value="rules">
           <TabPlaceholder
