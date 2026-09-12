@@ -9,6 +9,7 @@ import {
   ListTodo,
   LucideIcon,
   Package,
+  Radar,
   ShoppingBasket,
   ShoppingCart,
   SlidersHorizontal,
@@ -156,6 +157,17 @@ export const sidebarGroups: TSidebarGroup[] = [
         link: "/storefront/pc-builder",
         icon: Computer,
         permission: "can_see_pc_builder_page",
+      },
+    ],
+  },
+  {
+    label: "Marketing",
+    items: [
+      {
+        title: "Meta Pixel",
+        link: "/marketing/meta-pixel",
+        icon: Radar,
+        permission: "can_see_meta_pixel_page",
       },
     ],
   },
