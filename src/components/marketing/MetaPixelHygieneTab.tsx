@@ -125,7 +125,7 @@ const MetaPixelHygieneTab = ({ config }: { config: TMetaPixelConfig }) => {
 
       <SectionCard
         title="Excluded IP addresses"
-        description="Traffic from these addresses fires no events at all — use it to keep your own office, warehouse or VPN out of your ad data."
+        description="Visits from these addresses are never reported to Meta. Use it to keep your own office, warehouse or VPN out of your ad results."
       >
         <div className="flex flex-col gap-2">
           <Label htmlFor="meta-pixel-excluded-ip">Add an address</Label>
@@ -224,7 +224,7 @@ const MetaPixelHygieneTab = ({ config }: { config: TMetaPixelConfig }) => {
 
       <SectionCard
         title="Bot filtering"
-        description="Requests whose user agent looks like a crawler are skipped, so bot traffic never inflates your event counts."
+        description="Visits that look automated rather than human are ignored, so bot traffic never inflates your reported results."
       >
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border px-3 py-2">
           <div>
@@ -265,7 +265,7 @@ const MetaPixelHygieneTab = ({ config }: { config: TMetaPixelConfig }) => {
             </p>
             <p className="text-muted-foreground mt-0.5 text-xs">
               {config.enabled
-                ? "Events are being sent for storefront visitors."
+                ? "Customer activity is being reported to Meta."
                 : "No events are sent from anywhere, whatever the Events and Rules tabs say."}
             </p>
           </div>

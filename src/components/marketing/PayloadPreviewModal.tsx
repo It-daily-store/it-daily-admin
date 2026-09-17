@@ -21,7 +21,7 @@ const extractMessage = (err: unknown): string => {
     ?.data;
   return (
     data?.errorSources?.[0]?.message ??
-    "The payload could not be built. Check the Setup tab and try again."
+    "The preview could not be built. Check the Setup tab and try again."
   );
 };
 
@@ -75,7 +75,7 @@ const PayloadPreviewModal = ({
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      title="Payload preview"
+      title="What Meta receives"
       className="sm:max-w-2xl"
     >
       <div className="flex flex-col gap-3">
@@ -98,7 +98,7 @@ const PayloadPreviewModal = ({
           >
             <p className="text-destructive flex items-center gap-2 font-medium">
               <AlertTriangle size={16} />
-              No payload could be built
+              Nothing could be previewed
             </p>
             <p className="text-muted-foreground mt-1">{errorMessage}</p>
             <Button

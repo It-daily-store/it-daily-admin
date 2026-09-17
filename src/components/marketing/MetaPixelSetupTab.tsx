@@ -136,13 +136,13 @@ const USER_DATA_PARAMS: {
     key: "ge",
     label: "Gender",
     unavailable:
-      "Meta offers this parameter, but the storefront never asks for gender, so there would be nothing to send. Add it to the customer profile first.",
+      "Your store never asks customers for their gender, so there is nothing to share. This becomes available if gender is added to customer accounts.",
   },
   {
     key: "db",
     label: "Date of birth",
     unavailable:
-      "Meta offers this parameter, but the storefront never asks for a date of birth, so there would be nothing to send. Add it to the customer profile first.",
+      "Your store never asks customers for their date of birth, so there is nothing to share. This becomes available if it is added to customer accounts.",
   },
   { key: "ct", label: "City" },
   { key: "st", label: "State" },
@@ -150,7 +150,7 @@ const USER_DATA_PARAMS: {
     key: "zp",
     label: "Zip code",
     unavailable:
-      "Checkout collects an address, city and district but no postal code, so there would be nothing to send.",
+      "Checkout asks for an address, city and district, but not a postal code, so there is nothing to share.",
   },
   { key: "country", label: "Country" },
   { key: "external_id", label: "External ID" },
@@ -179,8 +179,8 @@ const CONTENT_ID_SOURCES: {
   label: string;
 }[] = [
   { value: "sku", label: "Product SKU" },
-  { value: "_id", label: "Database ID" },
-  { value: "slug", label: "Product slug" },
+  { value: "_id", label: "Internal product ID" },
+  { value: "slug", label: "Product web address" },
 ];
 
 const TestResultPanel = ({ result }: { result: TTestConnectionResult }) => {
@@ -221,7 +221,7 @@ const TestResultPanel = ({ result }: { result: TTestConnectionResult }) => {
       ) : (
         <>
           <p className="text-muted-foreground mt-2 text-xs">
-            Meta&apos;s reply, word for word
+            What Meta sent back
             {result.httpStatus ? ` (HTTP ${result.httpStatus})` : ""}:
           </p>
           <pre className="bg-muted mt-1 max-h-40 overflow-auto rounded p-2 font-mono text-xs whitespace-pre-wrap">
@@ -309,13 +309,13 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
   const testDisabledReason = readOnly
     ? READ_ONLY_REASON
     : !config.pixelId || !config.hasToken
-      ? "Save a dataset ID and an access token first. The test sends a real request to Meta using the stored credentials."
+      ? "Add a dataset ID and an access token, then save. The test contacts Meta using the details you have saved."
       : undefined;
 
   const capiDisabledReason = readOnly
     ? READ_ONLY_REASON
     : !config.tokenVerifiedAt
-      ? "Run Test connection first. The Conversions API stays off until Meta has accepted this access token."
+      ? "Run Test connection first. This stays off until Meta confirms your access token works."
       : undefined;
 
   return (
@@ -327,8 +327,8 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
         {readOnly && <ReadOnlyNotice />}
 
         <SectionCard
-          title="Pixel credentials"
-          description="The dataset ID identifies your dataset in Meta. The access token authorises server-side Conversions API sends and is stored encrypted."
+          title="Meta connection"
+          description="Connects this store to your Meta ad account. Both values come from Events Manager. Until they are saved, Meta receives nothing and your ads cannot be optimised for sales."
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
@@ -346,9 +346,9 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                     />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    Events Manager → Data sources. Meta now calls this the
-                    dataset ID; it is the same number as the old Pixel ID.
-                    Nothing is sent to Meta until this is set.
+                    Find it in Events Manager under Data sources. Meta used to
+                    call this the Pixel ID — it is the same number. Until it is
+                    filled in, nothing about your store reaches Meta.
                   </FormDescription>
                   <FormMessage role="alert" />
                 </FormItem>
@@ -375,8 +375,8 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                     />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    Stored encrypted and never displayed again. Leave this blank
-                    to keep the token you already saved.
+                    Saved securely and never shown again. Leave this blank to
+                    keep the token you already saved.
                   </FormDescription>
                   <FormMessage role="alert" />
                 </FormItem>
@@ -397,8 +397,9 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                     />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    Set this only while testing. Events sent with a code appear
-                    in Test events and are not used to optimise ads.
+                    Use this only while testing. Activity sent with a code shows
+                    up under Test events in Events Manager and is kept out of
+                    your real ad results. Clear it when you are done.
                   </FormDescription>
                   <FormMessage role="alert" />
                 </FormItem>
@@ -441,15 +442,15 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
 
         <SectionCard
           title="Conversions API"
-          description="Server-side sending. Verify the token against Meta before switching it on, so a bad credential never silently drops events."
+          description="Reports sales and other activity to Meta directly from this store, so conversions still reach your campaigns when a customer's browser blocks tracking. Test the connection before switching it on — an unverified token fails quietly."
         >
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border px-3 py-2">
             <div>
-              <p className="text-sm font-medium">Send events server-side</p>
+              <p className="text-sm font-medium">Report activity to Meta</p>
               <p className="text-muted-foreground mt-0.5 text-xs">
                 {config.tokenVerifiedAt
-                  ? "The token is verified, so order status rules and server-side triggers can send."
-                  : "Locked until a test connection succeeds."}
+                  ? "Your access token is verified. Order status rules can now report sales to Meta."
+                  : "Unavailable until a test connection succeeds."}
               </p>
             </div>
             <FormField
@@ -464,7 +465,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           disabled={Boolean(capiDisabledReason)}
-                          aria-label="Send events server-side"
+                          aria-label="Report activity to Meta"
                         />
                       </ControlWithReason>
                     </div>
@@ -475,10 +476,10 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
           </div>
 
           <p className="text-muted-foreground mt-3 text-xs">
-            Leave Meta&apos;s own one-click Conversions API switched off in
-            Events Manager → Settings. It sends its own server events with event
-            IDs this panel never sees, so Meta cannot match them against these
-            ones and every conversion is counted twice.
+            Keep Meta&apos;s own one-click Conversions API turned off in Events
+            Manager. If both are running, Meta cannot tell the two apart and
+            counts every sale twice, which inflates your reported results and
+            misleads campaign optimisation.
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -504,8 +505,8 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
         </SectionCard>
 
         <SectionCard
-          title="Event payload options"
-          description="How every event describes your products and money. These values are reported with each browser and server-side event."
+          title="Product and value reporting"
+          description="How your products and order values are described to Meta. These apply to everything reported from your store."
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
@@ -572,7 +573,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
 
         <SectionCard
           title="Customer information parameters"
-          description="Which customer details are hashed and sent with server-side events. Match these to the parameters you have switched on in Events Manager → your dataset → Settings. Browser ID, click ID, IP address and user agent are always sent, because Meta requires them for web events and offers no toggle."
+          description="Which customer details are shared with Meta so it can match a sale to the person who saw your ad. The more you share, the more sales Meta can attribute to your campaigns. Every detail is scrambled beyond recovery before it leaves this store — Meta never receives a readable email or phone number. Turn on the same ones you selected in Events Manager."
         >
           <div className="grid gap-2 sm:grid-cols-2">
             {USER_DATA_PARAMS.map(({ key, label, unavailable }) => (

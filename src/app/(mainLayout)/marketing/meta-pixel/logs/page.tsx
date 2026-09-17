@@ -280,7 +280,7 @@ const MetaPixelLogsView = () => {
             <Button
               variant="view_button"
               size="base"
-              tooltip="View the payload and Meta's response"
+              tooltip="View what was sent and how Meta replied"
               aria-label={`View the ${log.eventName} event sent at ${format(
                 new Date(log.createdAt),
                 "dd MMM yyyy, hh:mm a",
@@ -317,7 +317,7 @@ const MetaPixelLogsView = () => {
     <div>
       <PageHeader
         title="Meta Pixel event log"
-        subtitle="Every event sent to Meta, with the response"
+        subtitle="Everything reported to Meta, and how Meta replied"
         buttons={
           <Button variant="outline" asChild>
             <Link href="/marketing/meta-pixel">
@@ -552,7 +552,7 @@ const MetaPixelLogsView = () => {
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
-                <p className="mb-1 text-xs font-semibold">Payload sent</p>
+                <p className="mb-1 text-xs font-semibold">What was sent</p>
                 <pre className="bg-muted max-h-96 overflow-auto rounded p-3 font-mono text-xs">
                   {toJson(viewLog.payload)}
                 </pre>
