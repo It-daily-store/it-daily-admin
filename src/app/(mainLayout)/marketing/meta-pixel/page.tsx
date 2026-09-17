@@ -33,8 +33,8 @@ const buildSetupSteps = (config?: TMetaPixelConfig): TSetupStep[] => [
     label: "Pixel configured",
     done: Boolean(config?.pixelId),
     hint: config?.pixelId
-      ? `Pixel ID ${config.pixelId} is saved.`
-      : "Add your Pixel ID on the Setup tab. Nothing is sent to Meta until this is set.",
+      ? `Dataset ID ${config.pixelId} is saved.`
+      : "Add your dataset ID on the Setup tab. Nothing is sent to Meta until this is set.",
   },
   {
     label: "CAPI verified",

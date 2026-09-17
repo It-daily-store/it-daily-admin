@@ -22,7 +22,6 @@ export type TMetaPixelStatusRule = {
 export type TMetaPixelConfig = {
   _id: string;
   pixelId?: string;
-  datasetId?: string;
   testEventCode?: string;
   hasToken: boolean;
   tokenLast4?: string;

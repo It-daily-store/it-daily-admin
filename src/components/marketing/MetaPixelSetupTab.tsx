@@ -95,18 +95,10 @@ const setupSchema = z.object({
   pixelId: z
     .string()
     .trim()
-    .max(50, "A Pixel ID is at most 50 characters. Check for a stray paste.")
-    .regex(
-      /^\d*$/,
-      "A Pixel ID is all digits. Copy the ID from Events Manager → Data sources, not the pixel's name.",
-    ),
-  datasetId: z
-    .string()
-    .trim()
     .max(50, "A dataset ID is at most 50 characters. Check for a stray paste.")
     .regex(
       /^\d*$/,
-      "A dataset ID is all digits. Leave this blank to reuse the Pixel ID.",
+      "A dataset ID is all digits. Copy the ID from Events Manager → Data sources, not the dataset's name.",
     ),
   accessToken: z.string().trim(),
   testEventCode: z
@@ -131,7 +123,6 @@ type TSetupValues = z.infer<typeof setupSchema>;
 
 const toFormValues = (config: TMetaPixelConfig): TSetupValues => ({
   pixelId: config.pixelId ?? "",
-  datasetId: config.datasetId ?? "",
   accessToken: "",
   testEventCode: config.testEventCode ?? "",
   currency: config.currency ?? "BDT",
@@ -199,8 +190,8 @@ const TestResultPanel = ({ result }: { result: TTestConnectionResult }) => {
             </p>
           )}
           <p className="text-muted-foreground mt-2 text-sm">
-            Fix the Pixel ID or paste a fresh access token above, save, then run
-            the test again.
+            Fix the dataset ID or paste a fresh access token above, save, then
+            run the test again.
           </p>
         </>
       )}
@@ -274,7 +265,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
   const testDisabledReason = readOnly
     ? READ_ONLY_REASON
     : !config.pixelId || !config.hasToken
-      ? "Save a Pixel ID and an access token first. The test sends a real request to Meta using the stored credentials."
+      ? "Save a dataset ID and an access token first. The test sends a real request to Meta using the stored credentials."
       : undefined;
 
   const capiDisabledReason = readOnly
@@ -293,7 +284,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
 
         <SectionCard
           title="Pixel credentials"
-          description="The Pixel ID identifies your dataset in Meta. The access token authorises server-side Conversions API sends and is stored encrypted."
+          description="The dataset ID identifies your dataset in Meta. The access token authorises server-side Conversions API sends and is stored encrypted."
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
@@ -301,7 +292,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
               name="pixelId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pixel ID</FormLabel>
+                  <FormLabel>Dataset ID</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -311,31 +302,9 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                     />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    Events Manager → Data sources. Nothing is sent to Meta until
-                    this is set.
-                  </FormDescription>
-                  <FormMessage role="alert" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="datasetId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dataset ID</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      inputMode="numeric"
-                      disabled={readOnly}
-                      placeholder="Same as the Pixel ID"
-                    />
-                  </FormControl>
-                  <FormDescription className="text-xs">
-                    Leave blank to reuse the Pixel ID. Only set this if Meta
-                    gave you a separate Conversions API dataset.
+                    Events Manager → Data sources. Meta now calls this the
+                    dataset ID; it is the same number as the old Pixel ID.
+                    Nothing is sent to Meta until this is set.
                   </FormDescription>
                   <FormMessage role="alert" />
                 </FormItem>
