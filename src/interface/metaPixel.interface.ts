@@ -30,6 +30,7 @@ export type TMetaPixelConfig = {
   capiEnabled: boolean;
   currency: string;
   contentIdSource: TContentIdSource;
+  userDataParams?: Record<string, boolean>;
   contentType: string;
   excludedIps: string[];
   blockBots: boolean;

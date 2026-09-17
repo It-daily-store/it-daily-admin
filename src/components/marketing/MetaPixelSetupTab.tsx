@@ -117,7 +117,44 @@ const setupSchema = z.object({
     ),
   contentIdSource: z.enum(["sku", "_id", "slug"]),
   capiEnabled: z.boolean(),
+  userDataParams: z.record(z.string(), z.boolean()),
 });
+
+// Mirrors the customer information parameters in Events Manager → dataset →
+// Settings. fbp, fbc, IP and user agent are absent from that screen because Meta
+// always takes them for web events.
+const USER_DATA_PARAMS: {
+  key: string;
+  label: string;
+  unavailable?: string;
+}[] = [
+  { key: "em", label: "Email" },
+  { key: "ph", label: "Phone number" },
+  { key: "fn", label: "First name" },
+  { key: "ln", label: "Last name" },
+  {
+    key: "ge",
+    label: "Gender",
+    unavailable:
+      "Meta offers this parameter, but the storefront never asks for gender, so there would be nothing to send. Add it to the customer profile first.",
+  },
+  {
+    key: "db",
+    label: "Date of birth",
+    unavailable:
+      "Meta offers this parameter, but the storefront never asks for a date of birth, so there would be nothing to send. Add it to the customer profile first.",
+  },
+  { key: "ct", label: "City" },
+  { key: "st", label: "State" },
+  {
+    key: "zp",
+    label: "Zip code",
+    unavailable:
+      "Checkout collects an address, city and district but no postal code, so there would be nothing to send.",
+  },
+  { key: "country", label: "Country" },
+  { key: "external_id", label: "External ID" },
+];
 
 type TSetupValues = z.infer<typeof setupSchema>;
 
@@ -128,6 +165,13 @@ const toFormValues = (config: TMetaPixelConfig): TSetupValues => ({
   currency: config.currency ?? "BDT",
   contentIdSource: config.contentIdSource ?? "sku",
   capiEnabled: config.capiEnabled,
+  // An unset parameter is sent, so only an explicit false turns a switch off.
+  userDataParams: Object.fromEntries(
+    USER_DATA_PARAMS.map(({ key }) => [
+      key,
+      config.userDataParams?.[key] !== false,
+    ]),
+  ),
 });
 
 const CONTENT_ID_SOURCES: {
@@ -523,6 +567,55 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                 </FormItem>
               )}
             />
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Customer information parameters"
+          description="Which customer details are hashed and sent with server-side events. Match these to the parameters you have switched on in Events Manager → your dataset → Settings. Browser ID, click ID, IP address and user agent are always sent, because Meta requires them for web events and offers no toggle."
+        >
+          <div className="grid gap-2 sm:grid-cols-2">
+            {USER_DATA_PARAMS.map(({ key, label, unavailable }) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={`userDataParams.${key}`}
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <FormLabel
+                        className={cn(
+                          "text-sm font-normal",
+                          unavailable && "text-muted-foreground",
+                        )}
+                      >
+                        {label}
+                      </FormLabel>
+                      <span className="text-muted-foreground font-mono text-xs">
+                        {key}
+                      </span>
+                    </div>
+                    <FormControl>
+                      <div>
+                        <ControlWithReason
+                          reason={
+                            unavailable ??
+                            (readOnly ? READ_ONLY_REASON : undefined)
+                          }
+                        >
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={readOnly || Boolean(unavailable)}
+                            aria-label={`Send ${label}`}
+                          />
+                        </ControlWithReason>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            ))}
           </div>
         </SectionCard>
 
