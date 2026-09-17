@@ -95,18 +95,10 @@ const setupSchema = z.object({
   pixelId: z
     .string()
     .trim()
-    .max(50, "A Pixel ID is at most 50 characters. Check for a stray paste.")
-    .regex(
-      /^\d*$/,
-      "A Pixel ID is all digits. Copy the ID from Events Manager → Data sources, not the pixel's name.",
-    ),
-  datasetId: z
-    .string()
-    .trim()
     .max(50, "A dataset ID is at most 50 characters. Check for a stray paste.")
     .regex(
       /^\d*$/,
-      "A dataset ID is all digits. Leave this blank to reuse the Pixel ID.",
+      "A dataset ID is all digits. Copy the ID from Events Manager → Data sources, not the dataset's name.",
     ),
   accessToken: z.string().trim(),
   testEventCode: z
@@ -125,18 +117,61 @@ const setupSchema = z.object({
     ),
   contentIdSource: z.enum(["sku", "_id", "slug"]),
   capiEnabled: z.boolean(),
+  userDataParams: z.record(z.string(), z.boolean()),
 });
+
+// Mirrors the customer information parameters in Events Manager → dataset →
+// Settings. fbp, fbc, IP and user agent are absent from that screen because Meta
+// always takes them for web events.
+const USER_DATA_PARAMS: {
+  key: string;
+  label: string;
+  unavailable?: string;
+}[] = [
+  { key: "em", label: "Email" },
+  { key: "ph", label: "Phone number" },
+  { key: "fn", label: "First name" },
+  { key: "ln", label: "Last name" },
+  {
+    key: "ge",
+    label: "Gender",
+    unavailable:
+      "Meta offers this parameter, but the storefront never asks for gender, so there would be nothing to send. Add it to the customer profile first.",
+  },
+  {
+    key: "db",
+    label: "Date of birth",
+    unavailable:
+      "Meta offers this parameter, but the storefront never asks for a date of birth, so there would be nothing to send. Add it to the customer profile first.",
+  },
+  { key: "ct", label: "City" },
+  { key: "st", label: "State" },
+  {
+    key: "zp",
+    label: "Zip code",
+    unavailable:
+      "Checkout collects an address, city and district but no postal code, so there would be nothing to send.",
+  },
+  { key: "country", label: "Country" },
+  { key: "external_id", label: "External ID" },
+];
 
 type TSetupValues = z.infer<typeof setupSchema>;
 
 const toFormValues = (config: TMetaPixelConfig): TSetupValues => ({
   pixelId: config.pixelId ?? "",
-  datasetId: config.datasetId ?? "",
   accessToken: "",
   testEventCode: config.testEventCode ?? "",
   currency: config.currency ?? "BDT",
   contentIdSource: config.contentIdSource ?? "sku",
   capiEnabled: config.capiEnabled,
+  // An unset parameter is sent, so only an explicit false turns a switch off.
+  userDataParams: Object.fromEntries(
+    USER_DATA_PARAMS.map(({ key }) => [
+      key,
+      config.userDataParams?.[key] !== false,
+    ]),
+  ),
 });
 
 const CONTENT_ID_SOURCES: {
@@ -199,8 +234,8 @@ const TestResultPanel = ({ result }: { result: TTestConnectionResult }) => {
             </p>
           )}
           <p className="text-muted-foreground mt-2 text-sm">
-            Fix the Pixel ID or paste a fresh access token above, save, then run
-            the test again.
+            Fix the dataset ID or paste a fresh access token above, save, then
+            run the test again.
           </p>
         </>
       )}
@@ -274,7 +309,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
   const testDisabledReason = readOnly
     ? READ_ONLY_REASON
     : !config.pixelId || !config.hasToken
-      ? "Save a Pixel ID and an access token first. The test sends a real request to Meta using the stored credentials."
+      ? "Save a dataset ID and an access token first. The test sends a real request to Meta using the stored credentials."
       : undefined;
 
   const capiDisabledReason = readOnly
@@ -293,7 +328,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
 
         <SectionCard
           title="Pixel credentials"
-          description="The Pixel ID identifies your dataset in Meta. The access token authorises server-side Conversions API sends and is stored encrypted."
+          description="The dataset ID identifies your dataset in Meta. The access token authorises server-side Conversions API sends and is stored encrypted."
         >
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
@@ -301,7 +336,7 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
               name="pixelId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pixel ID</FormLabel>
+                  <FormLabel>Dataset ID</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -311,31 +346,9 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                     />
                   </FormControl>
                   <FormDescription className="text-xs">
-                    Events Manager → Data sources. Nothing is sent to Meta until
-                    this is set.
-                  </FormDescription>
-                  <FormMessage role="alert" />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="datasetId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dataset ID</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      inputMode="numeric"
-                      disabled={readOnly}
-                      placeholder="Same as the Pixel ID"
-                    />
-                  </FormControl>
-                  <FormDescription className="text-xs">
-                    Leave blank to reuse the Pixel ID. Only set this if Meta
-                    gave you a separate Conversions API dataset.
+                    Events Manager → Data sources. Meta now calls this the
+                    dataset ID; it is the same number as the old Pixel ID.
+                    Nothing is sent to Meta until this is set.
                   </FormDescription>
                   <FormMessage role="alert" />
                 </FormItem>
@@ -461,6 +474,13 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
             />
           </div>
 
+          <p className="text-muted-foreground mt-3 text-xs">
+            Leave Meta&apos;s own one-click Conversions API switched off in
+            Events Manager → Settings. It sends its own server events with event
+            IDs this panel never sees, so Meta cannot match them against these
+            ones and every conversion is counted twice.
+          </p>
+
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <ControlWithReason reason={testDisabledReason}>
               <Button
@@ -547,6 +567,55 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
                 </FormItem>
               )}
             />
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Customer information parameters"
+          description="Which customer details are hashed and sent with server-side events. Match these to the parameters you have switched on in Events Manager → your dataset → Settings. Browser ID, click ID, IP address and user agent are always sent, because Meta requires them for web events and offers no toggle."
+        >
+          <div className="grid gap-2 sm:grid-cols-2">
+            {USER_DATA_PARAMS.map(({ key, label, unavailable }) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={`userDataParams.${key}`}
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <FormLabel
+                        className={cn(
+                          "text-sm font-normal",
+                          unavailable && "text-muted-foreground",
+                        )}
+                      >
+                        {label}
+                      </FormLabel>
+                      <span className="text-muted-foreground font-mono text-xs">
+                        {key}
+                      </span>
+                    </div>
+                    <FormControl>
+                      <div>
+                        <ControlWithReason
+                          reason={
+                            unavailable ??
+                            (readOnly ? READ_ONLY_REASON : undefined)
+                          }
+                        >
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={readOnly || Boolean(unavailable)}
+                            aria-label={`Send ${label}`}
+                          />
+                        </ControlWithReason>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            ))}
           </div>
         </SectionCard>
 
