@@ -430,6 +430,13 @@ const MetaPixelSetupTab = ({ config }: { config: TMetaPixelConfig }) => {
             />
           </div>
 
+          <p className="text-muted-foreground mt-3 text-xs">
+            Leave Meta&apos;s own one-click Conversions API switched off in
+            Events Manager → Settings. It sends its own server events with event
+            IDs this panel never sees, so Meta cannot match them against these
+            ones and every conversion is counted twice.
+          </p>
+
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <ControlWithReason reason={testDisabledReason}>
               <Button
