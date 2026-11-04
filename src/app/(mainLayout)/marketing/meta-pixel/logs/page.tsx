@@ -280,7 +280,7 @@ const MetaPixelLogsView = () => {
             <Button
               variant="view_button"
               size="base"
-              tooltip="View the payload and Meta's response"
+              tooltip="View what was sent and how Meta replied"
               aria-label={`View the ${log.eventName} event sent at ${format(
                 new Date(log.createdAt),
                 "dd MMM yyyy, hh:mm a",
@@ -317,7 +317,7 @@ const MetaPixelLogsView = () => {
     <div>
       <PageHeader
         title="Meta Pixel event log"
-        subtitle="Every event sent to Meta, with the response"
+        subtitle="Events this store sent to Meta from its own server, and how Meta replied"
         buttons={
           <Button variant="outline" asChild>
             <Link href="/marketing/meta-pixel">
@@ -459,9 +459,11 @@ const MetaPixelLogsView = () => {
             <>
               <p className="text-sm font-semibold">No events yet</p>
               <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
-                Nothing has been sent to Meta so far. Run Test connection on the
-                Setup tab to send one, or wait for an order to reach a status
-                that has a rule.
+                Only events sent from this store&apos;s own server are listed
+                here. Activity sent straight from a visitor&apos;s browser
+                reaches Meta without passing through this store, so it appears
+                in Events Manager but never here. To list an action here, switch
+                on &ldquo;From this store&rdquo; for it on the Events tab.
               </p>
               <Button variant="outline" size="sm" className="mt-4" asChild>
                 <Link href="/marketing/meta-pixel">Go to Pixel settings</Link>
@@ -552,7 +554,7 @@ const MetaPixelLogsView = () => {
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
-                <p className="mb-1 text-xs font-semibold">Payload sent</p>
+                <p className="mb-1 text-xs font-semibold">What was sent</p>
                 <pre className="bg-muted max-h-96 overflow-auto rounded p-3 font-mono text-xs">
                   {toJson(viewLog.payload)}
                 </pre>

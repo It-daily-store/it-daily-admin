@@ -88,7 +88,7 @@ const MetaPixelStatusRulesTab = ({ config, onGoToSetup }: TProps) => {
 
         <SectionCard
           title="Order status rules"
-          description="Rules that send a server-side event when an order reaches a chosen status — this is where the Purchase event is sent from."
+          description="Reports a sale to Meta when an order reaches the status you choose. This is where your Purchase conversions come from, so pick the status that means the money is real."
         >
           <div className="rounded-md border border-dashed px-3 py-6">
             <p className="text-muted-foreground max-w-2xl text-sm">
@@ -176,7 +176,7 @@ const MetaPixelStatusRulesTab = ({ config, onGoToSetup }: TProps) => {
       cell: ({ row }) => {
         const rule = row.original;
         const previewDisabledReason = !rule._id
-          ? "This rule has not been saved yet, so there is no payload to preview. Reload the page and try again."
+          ? "This rule has not been saved yet, so there is nothing to preview. Reload the page and try again."
           : undefined;
 
         return (
@@ -189,9 +189,9 @@ const MetaPixelStatusRulesTab = ({ config, onGoToSetup }: TProps) => {
                 tooltip={
                   previewDisabledReason
                     ? undefined
-                    : "Preview the payload Meta would receive"
+                    : "Preview exactly what Meta would receive"
                 }
-                aria-label={`Preview the payload for ${rule.status} → ${rule.eventName}`}
+                aria-label={`Preview what Meta receives for ${rule.status} → ${rule.eventName}`}
                 onClick={() => setPreviewRuleId(rule._id ?? null)}
               />
             </ControlWithReason>
@@ -234,7 +234,7 @@ const MetaPixelStatusRulesTab = ({ config, onGoToSetup }: TProps) => {
 
       <SectionCard
         title="Order status rules"
-        description={`When an order reaches a status listed here, the matching event is sent to Meta from the server. ${enabledCount} of ${rules.length} rules are enabled.`}
+        description={`When an order reaches a status listed here, the matching sale is reported to Meta. ${enabledCount} of ${rules.length} rules are switched on.`}
       >
         {!readOnly && (
           <div className="mb-3 flex">
@@ -263,8 +263,8 @@ const MetaPixelStatusRulesTab = ({ config, onGoToSetup }: TProps) => {
               limit={rules.length}
             />
             <p className="text-muted-foreground mt-2 text-xs">
-              Preview builds the payload from the last saved rule and a recent
-              order, so save your changes before previewing them.
+              Preview uses your last saved rule and a recent order, so save your
+              changes before previewing them.
             </p>
           </>
         )}

@@ -57,7 +57,7 @@ const validateRow = (row: TMetaPixelTrigger): string | null => {
   const eventName = row.eventName.trim();
 
   if (row.enabled && !eventName) {
-    return "This trigger is enabled but has no Meta event. Pick a standard event, or choose Custom and type a name.";
+    return "This action is switched on but has no Meta event. Pick a standard event, or choose Custom and type a name.";
   }
 
   if (eventName && !EVENT_NAME_PATTERN.test(eventName)) {
@@ -144,14 +144,14 @@ const MetaPixelEventsTab = ({ config }: { config: TMetaPixelConfig }) => {
       {readOnly && <ReadOnlyNotice />}
 
       <SectionCard
-        title="Storefront trigger registry"
-        description={`Each storefront trigger point is mapped to a Meta event here, with independent browser and server-side delivery. ${enabledCount} of ${rows.length} triggers are enabled.`}
+        title="Customer actions"
+        description={`Choose which Meta event each customer action reports as, and whether it is sent from the customer's browser, from this store, or both. ${enabledCount} of ${rows.length} actions are switched on.`}
       >
         {rows.length === 0 ? (
           <p className="text-muted-foreground rounded-md border border-dashed px-3 py-6 text-sm">
-            No storefront triggers are registered. The registry is defined in
-            code, so this usually means the configuration failed to load —
-            reload the page, and contact a developer if it stays empty.
+            No customer actions are available. This usually means the settings
+            failed to load — reload the page, and ask your developer to look if
+            the list stays empty.
           </p>
         ) : (
           <>
@@ -159,11 +159,13 @@ const MetaPixelEventsTab = ({ config }: { config: TMetaPixelConfig }) => {
               <Table>
                 <TableHeader className="bg-card sticky top-0 z-10">
                   <TableRow>
-                    <TableHead className="min-w-56">Trigger</TableHead>
+                    <TableHead className="min-w-56">Customer action</TableHead>
                     <TableHead className="min-w-56">Meta event</TableHead>
                     <TableHead className="text-center">Enabled</TableHead>
-                    <TableHead className="text-center">Browser</TableHead>
-                    <TableHead className="text-center">CAPI</TableHead>
+                    <TableHead className="text-center">From browser</TableHead>
+                    <TableHead className="text-center">
+                      From this store
+                    </TableHead>
                     <TableHead className="text-right">Preview</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -177,15 +179,15 @@ const MetaPixelEventsTab = ({ config }: { config: TMetaPixelConfig }) => {
                     // A trigger with no server-side counterpart can never send, so that
                     // reason outranks the reversible "CAPI is off" one.
                     const capiDisabledReason = !backendVisible
-                      ? "This trigger has no server-side counterpart. It fires only in the browser, so there is nothing for the Conversions API to send."
+                      ? "This action happens entirely in the customer's browser, so there is nothing for this store to report separately."
                       : !config.capiEnabled
-                        ? "Finish Setup to enable the Conversions API. Save an access token, run Test connection, then switch server-side sending on."
+                        ? "Finish the Setup tab first: save an access token, run Test connection, then turn on Report activity to Meta."
                         : readOnly
                           ? READ_ONLY_REASON
                           : undefined;
 
                     const previewDisabledReason = !savedRow?.eventName
-                      ? "No Meta event is mapped to this trigger yet, so there is no payload to preview. Map an event and save first."
+                      ? "No Meta event is chosen for this action yet, so there is nothing to preview. Pick an event and save first."
                       : undefined;
 
                     const triggerName = meta?.label ?? row.key;
@@ -196,7 +198,7 @@ const MetaPixelEventsTab = ({ config }: { config: TMetaPixelConfig }) => {
                           <p className="text-sm font-medium">{triggerName}</p>
                           <p className="text-muted-foreground text-xs">
                             {meta?.description ??
-                              "Not in the label registry, but the storefront still knows this key."}
+                              "This action is not described here yet, but your store still reports it."}
                           </p>
                         </TableCell>
 
@@ -338,9 +340,9 @@ const MetaPixelEventsTab = ({ config }: { config: TMetaPixelConfig }) => {
                               tooltip={
                                 previewDisabledReason
                                   ? undefined
-                                  : "Preview the payload Meta would receive"
+                                  : "Preview exactly what Meta would receive"
                               }
-                              aria-label={`Preview the payload for ${triggerName}`}
+                              aria-label={`Preview what Meta receives for ${triggerName}`}
                               onClick={() => setPreviewKey(row.key)}
                             />
                           </ControlWithReason>
@@ -353,8 +355,8 @@ const MetaPixelEventsTab = ({ config }: { config: TMetaPixelConfig }) => {
             </div>
 
             <p className="text-muted-foreground mt-2 text-xs">
-              Preview builds the payload from the last saved mapping, so save
-              your changes before previewing them.
+              Preview shows your last saved settings, so save your changes
+              before previewing them.
             </p>
           </>
         )}

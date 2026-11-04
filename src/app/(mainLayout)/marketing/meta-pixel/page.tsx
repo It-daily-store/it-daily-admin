@@ -30,25 +30,25 @@ type TSetupStep = {
 
 const buildSetupSteps = (config?: TMetaPixelConfig): TSetupStep[] => [
   {
-    label: "Pixel configured",
+    label: "Account connected",
     done: Boolean(config?.pixelId),
     hint: config?.pixelId
       ? `Dataset ID ${config.pixelId} is saved.`
-      : "Add your dataset ID on the Setup tab. Nothing is sent to Meta until this is set.",
+      : "Add your dataset ID on the Setup tab. Until then, nothing about your store reaches Meta.",
   },
   {
-    label: "CAPI verified",
+    label: "Access token verified",
     done: Boolean(config?.capiEnabled),
     hint: config?.capiEnabled
-      ? "The access token has been verified against Meta, so server-side events can be sent."
-      : "Save an access token, then run Test connection on the Setup tab. Server-side events and order status rules stay off until this succeeds.",
+      ? "Meta has accepted your access token, so this store can report sales directly."
+      : "Save an access token, then run Test connection on the Setup tab. Order status rules stay off until this succeeds.",
   },
   {
     label: "Tracking live",
     done: Boolean(config?.enabled),
     hint: config?.enabled
-      ? "Events are being sent for storefront visitors."
-      : "The master switch is off, so no events are sent from anywhere. Turn it on from the Hygiene tab.",
+      ? "Customer activity is being reported to Meta."
+      : "The master switch is off, so nothing at all is reported to Meta. Turn it on from the Hygiene tab.",
   },
 ];
 
@@ -108,7 +108,7 @@ const MetaPixelPage = () => {
     <div>
       <PageHeader
         title="Meta Pixel"
-        subtitle="Configure the Meta Pixel and Conversions API for the storefront"
+        subtitle="Control what your store reports to Meta for ad tracking and conversions"
         buttons={
           can("can_read_meta_pixel_logs") ? (
             <Button variant="outline" asChild>
